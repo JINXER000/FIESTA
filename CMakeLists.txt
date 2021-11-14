@@ -71,3 +71,39 @@ target_link_libraries(test_fiesta
         ${OpenCV_LIBS}
         )
 
+add_executable(test_changerate
+        include/parameters.h
+        src/parameters.cpp
+        include/timing.h
+        src/timing.cc
+        include/raycast.h
+        src/raycast.cpp
+        include/ESDFMap.h
+        src/ESDFMap.cpp
+        include/Fiesta.h
+        test/test_changerate.cpp
+        )
+target_link_libraries(test_changerate
+        ${catkin_LIBRARIES}
+        ${PCL_LIBRARIES}
+        ${OpenCV_LIBS}
+        )
+
+
+add_executable(test_cam
+        include/parameters.h
+        src/parameters.cpp
+        include/timing.h
+        src/timing.cc
+        include/raycast.h
+        src/raycast.cpp
+        include/ESDFMap.h
+        src/ESDFMap.cpp
+        include/Fiesta.h
+        test/test_cam.cpp
+        )
+target_link_libraries(test_cam
+        ${catkin_LIBRARIES}
+        ${PCL_LIBRARIES}
+        ${OpenCV_LIBS}
+        )

@@ -23,6 +23,8 @@
 #include <visualization_msgs/Marker.h>
 #include <sensor_msgs/PointCloud.h>
 #include <unordered_set>
+#include <time_recorder.h>
+
 namespace fiesta {
 
 // sensor_msgs::PointCloud2::ConstPtr
@@ -82,6 +84,8 @@ private:
 public:
     Fiesta(ros::NodeHandle node);
     ~Fiesta();
+     tm_rcd* occu_rcd, *sdf_rcd, *rms_rcd;
+
 };
 
 template<class DepthMsgType, class PoseMsgType>
@@ -130,6 +134,12 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node) {
      update_mesh_timer_ =
          node.createTimer(ros::Duration(parameters_.update_esdf_every_n_sec_),
                           &Fiesta::UpdateEsdfEvent, this);
+
+     occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
+     sdf_rcd= new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf.txt");
+     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_rms005-32.txt");
+     std::cout<<"initialize done\n"<<std::endl;
+                          
 }
 
 template<class DepthMsgType, class PoseMsgType>
@@ -421,9 +431,11 @@ void Fiesta<DepthMsgType, PoseMsgType>::SynchronizationAndProcess() {
 
           if constexpr(std::is_same<DepthMsgType, sensor_msgs::Image::ConstPtr>::value) {
                DepthConversion();
+               // printf("----using camera!---");
           } else if constexpr(std::is_same<DepthMsgType, sensor_msgs::PointCloud2::ConstPtr>::value) {
                sensor_msgs::PointCloud2::ConstPtr tmp = depth_queue_.front();
                pcl::fromROSMsg(*tmp, cloud_);
+               // printf("----using pynt cloud!---");
           }
 
           std::cout << "Pointcloud Size:\t" << cloud_.points.size() << std::endl;
@@ -474,8 +486,15 @@ void Fiesta<DepthMsgType, PoseMsgType>::PoseCallback(const PoseMsgType &msg) {
 
 template<class DepthMsgType, class PoseMsgType>
 void Fiesta<DepthMsgType, PoseMsgType>::DepthCallback(const DepthMsgType &depth_map) {
+       auto start = std::chrono::steady_clock::now();
+
      depth_queue_.push(depth_map);
      SynchronizationAndProcess();
+
+     auto end = std::chrono::steady_clock::now();
+     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+     occu_rcd->record((float)duration);
+
 }
 
 template<class DepthMsgType, class PoseMsgType>
@@ -485,6 +504,7 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
      new_msg_ = false;
      cur_pos_ = sync_pos_;
 
+auto start = std::chrono::steady_clock::now();
 #ifndef PROBABILISTIC
      timing::Timer handlePCTimer("handlePointCloud");
        pcl::fromROSMsg(*sync_pc_, cloud_);
@@ -519,6 +539,13 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
 #endif
           update_esdf_timer.Stop();
           timing::Timing::Print(std::cout);
+          auto end = std::chrono::steady_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+          sdf_rcd->record((float)duration);
+          std::cout << "Dense mapping time: "
+                    << duration
+                    << " ms" << std::endl;
+
      }
 //    ros::Time t2 = ros::Time::now();
 
@@ -532,6 +559,8 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
 //        std::thread(Visualization, esdf_map_, text).detach();
           Visualization(esdf_map_, parameters_.global_vis_, "");
      }
+     // float rms = esdf_map_->CheckWithGroundTruth();
+     // rms_rcd->record(rms);
 //    else {
 //        std::thread(Visualization, nullptr, text).detach();
 //        Visualization(nullptr, globalVis, "");

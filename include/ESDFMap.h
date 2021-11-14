@@ -160,7 +160,7 @@ class ESDFMap {
   // only for test, check whether consistent
   bool CheckConsistency();
   // only for test, check between Ground Truth calculated by k-d tree
-  bool CheckWithGroundTruth();
+  float CheckWithGroundTruth();
 #endif
 
 };

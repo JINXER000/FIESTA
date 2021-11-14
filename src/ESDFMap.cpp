@@ -902,7 +902,7 @@ bool fiesta::ESDFMap::CheckConsistency() {
 }
 
 // only for test, check between Ground Truth calculated by k-d tree
-bool fiesta::ESDFMap::CheckWithGroundTruth() {
+float fiesta::ESDFMap::CheckWithGroundTruth() {
 #ifdef HASH_TABLE
   Eigen::Vector3i ma = Eigen::Vector3i(0, 0, 0), mi = Eigen::Vector3i(0, 0, 0);
   //        ESDFMap *esdf_map_ = new ESDFMap(Eigen::Vector3d(0, 0, 0), resolution, 10000000);
@@ -967,7 +967,7 @@ bool fiesta::ESDFMap::CheckWithGroundTruth() {
     }
   }
 
-  std::cout << count << std::endl;
+  std::cout << count <<"resolutioin is "<<resolution_<< std::endl;
   std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
   std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
   std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
@@ -1039,18 +1039,19 @@ bool fiesta::ESDFMap::CheckWithGroundTruth() {
           }
         }
 
-    std::cout << grid_total_size_ << std::endl;
+  std::cout << "resolutioin is "<<resolution_<< std::endl;
     std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
     std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
     std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
-    std::cout << ems2 << " / " << cnt2 << " = " << ems2 / cnt2 << std::endl;
+    std::cout <<"sqrt"<< ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
     std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
-    for (int i = 0; i < 32; i++) {
-      std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
-    }
+    // for (int i = 0; i < 32; i++) {
+    //   std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
+    // }
 
 #endif
-  return true;
+  // return true;
+  return sqrt(ems2 / cnt2);
 }
 
 // endregion
