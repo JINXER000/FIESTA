@@ -58,7 +58,7 @@
         <param name="visualize_every_n_updates" value="1"/>
         <param name="slice_vis_max_dist" value="2.0"/>
         <!-- relative to the lz if array is used, relative to the origin if hash table is used -->
-        <param name="slice_vis_level" value="1.6"/>
+        <param name="slice_vis_level" value="2.6"/>
         <param name="vis_lower_bound" value="0"/>
         <param name="vis_upper_bound" value="+10"/>
 
