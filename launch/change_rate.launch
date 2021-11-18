@@ -46,7 +46,7 @@
         <param name="radius_z" value="3"/>
 
         <!--depth_filter -->
-        <param name="use_depth_filter" value="true"/>
+        <param name="use_depth_filter" value="false"/>
         <param name="depth_filter_tolerance" value="0.1"/>
         <param name="depth_filter_max_dist" value="10.0"/>
         <param name="depth_filter_min_dist" value="0.1"/>

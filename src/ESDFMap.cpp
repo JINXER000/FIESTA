@@ -9,11 +9,13 @@
 using std::cout;
 using std::endl;
 
-const double fiesta::ESDFMap::Logit(const double &x) const {
+const double fiesta::ESDFMap::Logit(const double &x) const
+{
   return log(x / (1 - x));
 }
 
-bool fiesta::ESDFMap::Exist(const int &idx) {
+bool fiesta::ESDFMap::Exist(const int &idx)
+{
 #ifdef PROBABILISTIC
   return occupancy_buffer_[idx] > min_occupancy_log_;
 #else
@@ -21,7 +23,8 @@ bool fiesta::ESDFMap::Exist(const int &idx) {
 #endif
 }
 
-void fiesta::ESDFMap::DeleteFromList(int link, int idx) {
+void fiesta::ESDFMap::DeleteFromList(int link, int idx)
+{
   if (prev_[idx] != undefined_)
     next_[prev_[idx]] = next_[idx];
   else
@@ -31,10 +34,12 @@ void fiesta::ESDFMap::DeleteFromList(int link, int idx) {
   prev_[idx] = next_[idx] = undefined_;
 }
 
-void fiesta::ESDFMap::InsertIntoList(int link, int idx) {
+void fiesta::ESDFMap::InsertIntoList(int link, int idx)
+{
   if (head_[link] == undefined_)
     head_[link] = idx;
-  else {
+  else
+  {
     prev_[head_[link]] = idx;
     next_[idx] = head_[link];
     head_[link] = idx;
@@ -43,47 +48,51 @@ void fiesta::ESDFMap::InsertIntoList(int link, int idx) {
 
 // region CONVERSION
 
-bool fiesta::ESDFMap::PosInMap(Eigen::Vector3d pos) {
+bool fiesta::ESDFMap::PosInMap(Eigen::Vector3d pos)
+{
 #ifdef HASH_TABLE
   return true;
 #else
-  if (pos(0) < min_range_(0) || pos(1) < min_range_(1) || pos(2) < min_range_(2)) {
-//    cout << "less than min range!\t" << pos(0) << ' ' << pos(1) << ' ' << pos(2) << endl;
+  if (pos(0) < min_range_(0) || pos(1) < min_range_(1) || pos(2) < min_range_(2))
+  {
+    //    cout << "less than min range!\t" << pos(0) << ' ' << pos(1) << ' ' << pos(2) << endl;
     return false;
   }
 
-  if (pos(0) > max_range_(0) || pos(1) > max_range_(1) || pos(2) > max_range_(2)) {
-//    cout << "larger than min range!\t" << pos(0) << ' ' << pos(1) << ' ' << pos(2) << endl;
+  if (pos(0) > max_range_(0) || pos(1) > max_range_(1) || pos(2) > max_range_(2))
+  {
+    //    cout << "larger than min range!\t" << pos(0) << ' ' << pos(1) << ' ' << pos(2) << endl;
     return false;
   }
   return true;
 #endif
 }
 
-bool fiesta::ESDFMap::VoxInRange(Eigen::Vector3i vox, bool current_vec) {
+bool fiesta::ESDFMap::VoxInRange(Eigen::Vector3i vox, bool current_vec)
+{
   if (current_vec)
-    return (vox(0) >= min_vec_(0) && vox(0) <= max_vec_(0)
-        && vox(1) >= min_vec_(1) && vox(1) <= max_vec_(1)
-        && vox(2) >= min_vec_(2) && vox(2) <= max_vec_(2));
+    return (vox(0) >= min_vec_(0) && vox(0) <= max_vec_(0) && vox(1) >= min_vec_(1) && vox(1) <= max_vec_(1) && vox(2) >= min_vec_(2) && vox(2) <= max_vec_(2));
   else
-    return (vox(0) >= last_min_vec_(0) && vox(0) <= last_max_vec_(0)
-        && vox(1) >= last_min_vec_(1) && vox(1) <= last_max_vec_(1)
-        && vox(2) >= last_min_vec_(2) && vox(2) <= last_max_vec_(2));
+    return (vox(0) >= last_min_vec_(0) && vox(0) <= last_max_vec_(0) && vox(1) >= last_min_vec_(1) && vox(1) <= last_max_vec_(1) && vox(2) >= last_min_vec_(2) && vox(2) <= last_max_vec_(2));
 }
 
-void fiesta::ESDFMap::Pos2Vox(Eigen::Vector3d pos, Eigen::Vector3i &vox) {
+void fiesta::ESDFMap::Pos2Vox(Eigen::Vector3d pos, Eigen::Vector3i &vox)
+{
   for (int i = 0; i < 3; ++i)
     vox(i) = floor((pos(i) - origin_(i)) / resolution_);
 }
 
-void fiesta::ESDFMap::Vox2Pos(Eigen::Vector3i vox, Eigen::Vector3d &pos) {
+void fiesta::ESDFMap::Vox2Pos(Eigen::Vector3i vox, Eigen::Vector3d &pos)
+{
   for (int i = 0; i < 3; ++i)
     pos(i) = (vox(i) + 0.5) * resolution_ + origin_(i);
 }
 
-int fiesta::ESDFMap::Vox2Idx(Eigen::Vector3i vox) {
+int fiesta::ESDFMap::Vox2Idx(Eigen::Vector3i vox)
+{
 #ifdef HASH_TABLE
-  if (vox(0) == undefined_) return reserved_idx_4_undefined_;
+  if (vox(0) == undefined_)
+    return reserved_idx_4_undefined_;
   return FindAndInsert(Eigen::Vector3i(vox(0), vox(1), vox(2)));
 #else
   if (vox(0) == undefined_)
@@ -92,21 +101,22 @@ int fiesta::ESDFMap::Vox2Idx(Eigen::Vector3i vox) {
 #endif
 }
 
-int fiesta::ESDFMap::Vox2Idx(Eigen::Vector3i vox, int sub_sampling_factor) {
+int fiesta::ESDFMap::Vox2Idx(Eigen::Vector3i vox, int sub_sampling_factor)
+{
 #ifdef HASH_TABLE
   // TODO: ignore sub_sampling_factor
-  if (vox(0) == undefined_) return reserved_idx_4_undefined_;
+  if (vox(0) == undefined_)
+    return reserved_idx_4_undefined_;
   return FindAndInsert(Eigen::Vector3i(vox(0), vox(1), vox(2)));
 #else
   if (vox(0) == undefined_)
     return reserved_idx_4_undefined_;
-  return vox(0) * grid_size_yz_ / sub_sampling_factor / sub_sampling_factor / sub_sampling_factor
-      + vox(1) * grid_size_(2) / sub_sampling_factor / sub_sampling_factor
-      + vox(2) / sub_sampling_factor;
+  return vox(0) * grid_size_yz_ / sub_sampling_factor / sub_sampling_factor / sub_sampling_factor + vox(1) * grid_size_(2) / sub_sampling_factor / sub_sampling_factor + vox(2) / sub_sampling_factor;
 #endif
 }
 
-Eigen::Vector3i fiesta::ESDFMap::Idx2Vox(int idx) {
+Eigen::Vector3i fiesta::ESDFMap::Idx2Vox(int idx)
+{
 #ifdef HASH_TABLE
   return vox_buffer_[idx];
 #else
@@ -114,21 +124,22 @@ Eigen::Vector3i fiesta::ESDFMap::Idx2Vox(int idx) {
                          idx % (grid_size_yz_) / grid_size_(2),
                          idx % grid_size_(2));
 #endif
-
 }
 
 // endregion
 
-double fiesta::ESDFMap::Dist(Eigen::Vector3i a, Eigen::Vector3i b) {
+double fiesta::ESDFMap::Dist(Eigen::Vector3i a, Eigen::Vector3i b)
+{
   return (b - a).cast<double>().norm() * resolution_;
-//        return (b - a).squaredNorm();
-// TODO: may use square root & * resolution_ at last together to speed up
+  //        return (b - a).squaredNorm();
+  // TODO: may use square root & * resolution_ at last together to speed up
 }
 
 #ifdef HASH_TABLE
 
 fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, int reserve_size)
-    : origin_(origin), resolution_(resolution_) {
+    : origin_(origin), resolution_(resolution_)
+{
   resolution_inv_ = 1 / resolution_;
   infinity_ = 10000;
   undefined_ = -10000;
@@ -138,7 +149,8 @@ fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, int reserve
   block_ = (1 << block_bit_);
 
   block_size_ = block_ * block_ * block_;
-  if (block_size_ > reserve_size) reserve_size = block_size_;
+  if (block_size_ > reserve_size)
+    reserve_size = block_size_;
 #endif
   SetOriginalRange();
   count = 1; // 0 is used for special use
@@ -150,7 +162,7 @@ fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, int reserve
   num_hit_.resize(reserve_size_);
   num_miss_.resize(reserve_size_);
 
-  std::fill(distance_buffer_.begin(), distance_buffer_.end(), (double) undefined_);
+  std::fill(distance_buffer_.begin(), distance_buffer_.end(), (double)undefined_);
   std::fill(occupancy_buffer_.begin(), occupancy_buffer_.end(), 0);
   std::fill(closest_obstacle_.begin(), closest_obstacle_.end(), Eigen::Vector3i(undefined_, undefined_, undefined_));
   std::fill(vox_buffer_.begin(), vox_buffer_.end(), Eigen::Vector3i(undefined_, undefined_, undefined_));
@@ -164,12 +176,16 @@ fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, int reserve
   std::fill(prev_.begin(), prev_.end(), undefined_);
   std::fill(next_.begin(), next_.end(), undefined_);
 
+  gt_edf = new float[map_size_.x*map_size_.y*map_size_.z];
+  occu_cld = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+
 }
 
 #else
 
 fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, Eigen::Vector3d map_size)
-    : origin_(origin), resolution_(resolution_), map_size_(map_size) {
+    : origin_(origin), resolution_(resolution_), map_size_(map_size)
+{
   resolution_inv_ = 1 / resolution_;
 
   for (int i = 0; i < 3; ++i)
@@ -189,14 +205,14 @@ fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, Eigen::Vect
   occupancy_buffer_.resize(grid_total_size_);
 
   distance_buffer_.resize(grid_total_size_);
-//    distanceBufferNegative.resize(grid_total_size_);
+  //    distanceBufferNegative.resize(grid_total_size_);
 
   closest_obstacle_.resize(grid_total_size_);
   num_hit_.resize(grid_total_size_);
   num_miss_.resize(grid_total_size_);
 
-  std::fill(distance_buffer_.begin(), distance_buffer_.end(), (double) undefined_);
-//    std::fill(distanceBufferNegative.begin(), distanceBufferNegative.end(), (double) undefined_);
+  std::fill(distance_buffer_.begin(), distance_buffer_.end(), (double)undefined_);
+  //    std::fill(distanceBufferNegative.begin(), distanceBufferNegative.end(), (double) undefined_);
 
   std::fill(occupancy_buffer_.begin(), occupancy_buffer_.end(), 0);
   std::fill(closest_obstacle_.begin(), closest_obstacle_.end(), Eigen::Vector3i(undefined_, undefined_, undefined_));
@@ -210,12 +226,20 @@ fiesta::ESDFMap::ESDFMap(Eigen::Vector3d origin, double resolution_, Eigen::Vect
   std::fill(prev_.begin(), prev_.end(), undefined_);
   std::fill(next_.begin(), next_.end(), undefined_);
 
+  const int grid_x = grid_size_(0);
+  const int grid_y = grid_size_(1);
+  const int grid_z = grid_size_(2);
+  gt_edf = new float[grid_x*grid_y*grid_z];
+  occu_cld = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
+
+
 }
 
 #endif
 
 #ifdef PROBABILISTIC
-void fiesta::ESDFMap::SetParameters(double p_hit, double p_miss, double p_min, double p_max, double p_occ) {
+void fiesta::ESDFMap::SetParameters(double p_hit, double p_miss, double p_min, double p_max, double p_occ)
+{
   prob_hit_log_ = Logit(p_hit);
   prob_miss_log_ = Logit(p_miss);
   clamp_min_log_ = Logit(p_min);
@@ -224,7 +248,8 @@ void fiesta::ESDFMap::SetParameters(double p_hit, double p_miss, double p_min, d
 }
 #endif
 
-bool fiesta::ESDFMap::CheckUpdate() {
+bool fiesta::ESDFMap::CheckUpdate()
+{
 #ifdef PROBABILISTIC
   return !occupancy_queue_.empty();
 #else
@@ -232,10 +257,12 @@ bool fiesta::ESDFMap::CheckUpdate() {
 #endif
 }
 
-bool fiesta::ESDFMap::UpdateOccupancy(bool global_map) {
+bool fiesta::ESDFMap::UpdateOccupancy(bool global_map)
+{
 #ifdef PROBABILISTIC
   cout << "Occupancy Update" << ' ' << occupancy_queue_.size() << '\t';
-  while (!occupancy_queue_.empty()) {
+  while (!occupancy_queue_.empty())
+  {
     QueueElement xx = occupancy_queue_.front();
     occupancy_queue_.pop();
     int idx = Vox2Idx(xx.point_);
@@ -243,43 +270,52 @@ bool fiesta::ESDFMap::UpdateOccupancy(bool global_map) {
     double log_odds_update = (num_hit_[idx] >= num_miss_[idx] - num_hit_[idx] ? prob_hit_log_ : prob_miss_log_);
 
     num_hit_[idx] = num_miss_[idx] = 0;
-    if (distance_buffer_[idx] < 0) {
+    if (distance_buffer_[idx] < 0)
+    {
       distance_buffer_[idx] = infinity_;
       InsertIntoList(reserved_idx_4_undefined_, idx);
     }
     if ((log_odds_update >= 0 &&
-        occupancy_buffer_[idx] >= clamp_max_log_) ||
+         occupancy_buffer_[idx] >= clamp_max_log_) ||
         (log_odds_update <= 0 &&
-            occupancy_buffer_[idx] <= clamp_min_log_)) {
+         occupancy_buffer_[idx] <= clamp_min_log_))
+    {
       continue;
     }
-    if (!global_map && !VoxInRange(xx.point_, false)) {
+    if (!global_map && !VoxInRange(xx.point_, false))
+    {
       occupancy_buffer_[idx] = 0;
       distance_buffer_[idx] = infinity_;
     }
     occupancy_buffer_[idx] = std::min(
         std::max(occupancy_buffer_[idx] + log_odds_update, clamp_min_log_),
         clamp_max_log_);
-    if (Exist(idx) && !occupy) {
+    if (Exist(idx) && !occupy)
+    {
       insert_queue_.push(QueueElement{xx.point_, 0.0});
-    } else if (!Exist(idx) && occupy) {
-      delete_queue_.push(QueueElement{xx.point_, (double) infinity_});
+    }
+    else if (!Exist(idx) && occupy)
+    {
+      delete_queue_.push(QueueElement{xx.point_, (double)infinity_});
     }
   }
 #endif
   return !insert_queue_.empty() || !delete_queue_.empty();
 }
 
-void fiesta::ESDFMap::UpdateESDF() {
-//    clock_t startTime,endTime;
-//    startTime = clock();
-//    UpdateOccupancy();
+void fiesta::ESDFMap::UpdateESDF()
+{
+  //    clock_t startTime,endTime;
+  //    startTime = clock();
+  //    UpdateOccupancy();
   cout << "Insert " << insert_queue_.size() << "\tDelete " << delete_queue_.size() << endl;
-  while (!insert_queue_.empty()) {
+  while (!insert_queue_.empty())
+  {
     QueueElement xx = insert_queue_.front();
     insert_queue_.pop();
     int idx = Vox2Idx(xx.point_);
-    if (Exist(idx)) {
+    if (Exist(idx))
+    {
       // Exist after a whole brunch of updates
       // delete previous link & create a new linked-list
       DeleteFromList(Vox2Idx(closest_obstacle_[idx]), idx);
@@ -289,36 +325,41 @@ void fiesta::ESDFMap::UpdateESDF() {
       update_queue_.push(xx);
     }
   }
-  while (!delete_queue_.empty()) {
+  while (!delete_queue_.empty())
+  {
     QueueElement xx = delete_queue_.front();
 
     delete_queue_.pop();
     int idx = Vox2Idx(xx.point_);
-    if (!Exist(idx)) {
+    if (!Exist(idx))
+    {
       // doesn't Exist after a whole brunch of updates
 
       int next_obs_idx;
-      for (int obs_idx = head_[idx]; obs_idx != undefined_; obs_idx = next_obs_idx) {
+      for (int obs_idx = head_[idx]; obs_idx != undefined_; obs_idx = next_obs_idx)
+      {
 
         closest_obstacle_[obs_idx] = Eigen::Vector3i(undefined_, undefined_, undefined_);
         Eigen::Vector3i obs_vox = Idx2Vox(obs_idx);
 
         double distance = infinity_;
         // find neighborhood whose closest obstacles Exist
-        for (const auto &dir : dirs_) {
+        for (const auto &dir : dirs_)
+        {
           Eigen::Vector3i new_pos = obs_vox + dir;
           int new_pos_idx = Vox2Idx(new_pos);
-          if (VoxInRange(new_pos) && closest_obstacle_[new_pos_idx](0) != undefined_
-              && Exist(Vox2Idx(closest_obstacle_[new_pos_idx]))) {
+          if (VoxInRange(new_pos) && closest_obstacle_[new_pos_idx](0) != undefined_ && Exist(Vox2Idx(closest_obstacle_[new_pos_idx])))
+          {
             // if in range and closest obstacles Exist
             double tmp = Dist(obs_vox, closest_obstacle_[new_pos_idx]);
-            if (tmp < distance) {
+            if (tmp < distance)
+            {
               distance = tmp;
               closest_obstacle_[obs_idx] = closest_obstacle_[new_pos_idx];
             }
             break;
           } // if
-        } // for neighborhood
+        }   // for neighborhood
 
         // destroy the linked-list
         prev_[obs_idx] = undefined_;
@@ -326,7 +367,8 @@ void fiesta::ESDFMap::UpdateESDF() {
         next_[obs_idx] = undefined_;
 
         distance_buffer_[obs_idx] = distance;
-        if (distance < infinity_) {
+        if (distance < infinity_)
+        {
           update_queue_.push(QueueElement{obs_vox, distance});
         }
         int new_obs_idx = Vox2Idx(closest_obstacle_[obs_idx]);
@@ -334,11 +376,12 @@ void fiesta::ESDFMap::UpdateESDF() {
       } // for obs_idx
       head_[idx] = undefined_;
     } // if
-  } // delete_queue_
+  }   // delete_queue_
   int times = 0, change_num = 0;
-  while (!update_queue_.empty()) {
+  while (!update_queue_.empty())
+  {
     QueueElement xx = update_queue_.front();
-//            QueueElement xx = update_queue_.top();
+    //            QueueElement xx = update_queue_.top();
 
     update_queue_.pop();
     int idx = Vox2Idx(xx.point_);
@@ -346,15 +389,18 @@ void fiesta::ESDFMap::UpdateESDF() {
       continue;
     times++;
     bool change = false;
-    for (int i = 0; i < num_dirs_; i++) {
+    for (int i = 0; i < num_dirs_; i++)
+    {
       Eigen::Vector3i new_pos = xx.point_ + dirs_[i];
-      if (VoxInRange(new_pos)) {
+      if (VoxInRange(new_pos))
+      {
         int new_pos_idx = Vox2Idx(new_pos);
         if (closest_obstacle_[new_pos_idx](0) == undefined_)
           continue;
         double tmp = Dist(xx.point_, closest_obstacle_[new_pos_idx]);
 
-        if (distance_buffer_[idx] > tmp) {
+        if (distance_buffer_[idx] > tmp)
+        {
           distance_buffer_[idx] = tmp;
           change = true;
           DeleteFromList(Vox2Idx(closest_obstacle_[idx]), idx);
@@ -366,20 +412,24 @@ void fiesta::ESDFMap::UpdateESDF() {
       }
     }
 
-    if (change) {
+    if (change)
+    {
       change_num++;
       update_queue_.push(QueueElement{xx.point_, distance_buffer_[idx]});
       continue;
     }
 
     int new_obs_idx = Vox2Idx(closest_obstacle_[idx]);
-    for (const auto &dir : dirs_) {
+    for (const auto &dir : dirs_)
+    {
       Eigen::Vector3i new_pos = xx.point_ + dir;
-      if (VoxInRange(new_pos)) {
+      if (VoxInRange(new_pos))
+      {
         int new_pos_id = Vox2Idx(new_pos);
 
         double tmp = Dist(new_pos, closest_obstacle_[idx]);
-        if (distance_buffer_[new_pos_id] > tmp) {
+        if (distance_buffer_[new_pos_id] > tmp)
+        {
           distance_buffer_[new_pos_id] = tmp;
           DeleteFromList(Vox2Idx(closest_obstacle_[new_pos_id]), new_pos_id);
 
@@ -393,19 +443,21 @@ void fiesta::ESDFMap::UpdateESDF() {
   total_time_ += times;
   cout << "Expanding " << times << " nodes, with change_num = " << change_num << ", accumulator = " << total_time_
        << endl;
-//    endTime = clock();
-//    cout << "Totle Time : " <<(double)(endTime - startTime) / CLOCKS_PER_SEC << "s" << endl;
+  //    endTime = clock();
+  //    cout << "Totle Time : " <<(double)(endTime - startTime) / CLOCKS_PER_SEC << "s" << endl;
 }
 
-
-int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3d pos, int occ) {
-  if (occ != 1 && occ != 0) {
+int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3d pos, int occ)
+{
+  if (occ != 1 && occ != 0)
+  {
     cout << "occ value error!" << endl;
     return undefined_;
   }
 
-  if (!PosInMap(pos)) {
-//        cout << "Not in map" << endl;
+  if (!PosInMap(pos))
+  {
+    //        cout << "Not in map" << endl;
     return undefined_;
   }
 
@@ -414,8 +466,9 @@ int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3d pos, int occ) {
   return SetOccupancy(vox, occ);
 }
 
-int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3i vox, int occ) {
-  int idx = Vox2Idx(vox);//, idx2 = Vox2Idx(vox, 2);
+int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3i vox, int occ)
+{
+  int idx = Vox2Idx(vox); //, idx2 = Vox2Idx(vox, 2);
 
   if (!VoxInRange(vox))
     return idx;
@@ -423,7 +476,8 @@ int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3i vox, int occ) {
 #ifdef PROBABILISTIC
   num_miss_[idx]++;
   num_hit_[idx] += occ;
-  if (num_miss_[idx] == 1) {
+  if (num_miss_[idx] == 1)
+  {
 #ifdef HASH_TABLE
     occupancy_queue_.push(QueueElement{vox, 0.0});
 #else
@@ -436,20 +490,25 @@ int fiesta::ESDFMap::SetOccupancy(Eigen::Vector3i vox, int occ) {
 
   return idx;
 #else
-  if (occupancy_buffer_[idx] != occ && occupancy_buffer_[idx] != (occ | 2)) {
-//        cout << occupancy_buffer_[idx] << "\t" << occ << endl;
-      if (occ == 1) insert_queue_.push(QueueElement{vox, 0.0});
-      else delete_queue_.push(QueueElement{vox, (double)infinity_});
+  if (occupancy_buffer_[idx] != occ && occupancy_buffer_[idx] != (occ | 2))
+  {
+    //        cout << occupancy_buffer_[idx] << "\t" << occ << endl;
+    if (occ == 1)
+      insert_queue_.push(QueueElement{vox, 0.0});
+    else
+      delete_queue_.push(QueueElement{vox, (double)infinity_});
   }
   occupancy_buffer_[idx] = occ;
-  if (distance_buffer_[idx] < 0) {
-      distance_buffer_[idx] = infinity_;
-      InsertIntoList(reserved_idx_4_undefined_, idx);
+  if (distance_buffer_[idx] < 0)
+  {
+    distance_buffer_[idx] = infinity_;
+    InsertIntoList(reserved_idx_4_undefined_, idx);
   }
 #endif
 }
 
-int fiesta::ESDFMap::GetOccupancy(Eigen::Vector3d pos) {
+int fiesta::ESDFMap::GetOccupancy(Eigen::Vector3d pos)
+{
   if (!PosInMap(pos))
     return undefined_;
 
@@ -459,12 +518,14 @@ int fiesta::ESDFMap::GetOccupancy(Eigen::Vector3d pos) {
   return Exist(Vox2Idx(vox));
 }
 
-int fiesta::ESDFMap::GetOccupancy(Eigen::Vector3i pos_id) {
+int fiesta::ESDFMap::GetOccupancy(Eigen::Vector3i pos_id)
+{
   // TODO: no boundary check
   return Exist(Vox2Idx(std::move(pos_id)));
 }
 
-double fiesta::ESDFMap::GetDistance(Eigen::Vector3d pos) {
+double fiesta::ESDFMap::GetDistance(Eigen::Vector3d pos)
+{
   if (!PosInMap(pos))
     return undefined_;
 
@@ -474,12 +535,14 @@ double fiesta::ESDFMap::GetDistance(Eigen::Vector3d pos) {
   return GetDistance(vox);
 }
 
-double fiesta::ESDFMap::GetDistance(Eigen::Vector3i vox) {
+double fiesta::ESDFMap::GetDistance(Eigen::Vector3i vox)
+{
   return distance_buffer_[Vox2Idx(vox)] < 0 ? infinity_ : distance_buffer_[Vox2Idx(vox)];
 }
 
 double fiesta::ESDFMap::GetDistWithGradTrilinear(Eigen::Vector3d pos,
-                                                 Eigen::Vector3d &grad) {
+                                                 Eigen::Vector3d &grad)
+{
   if (!PosInMap(pos))
     return -1;
 
@@ -499,7 +562,7 @@ double fiesta::ESDFMap::GetDistWithGradTrilinear(Eigen::Vector3d pos,
 
   Eigen::Vector3i idx;
   Pos2Vox(pos_m, idx);
-//    cout << voxInMap(idx) << endl;
+  //    cout << voxInMap(idx) << endl;
 
   Eigen::Vector3d idx_pos, diff;
   Vox2Pos(idx, idx_pos);
@@ -507,9 +570,12 @@ double fiesta::ESDFMap::GetDistWithGradTrilinear(Eigen::Vector3d pos,
   diff = (pos - idx_pos) * resolution_inv_;
 
   double values[2][2][2];
-  for (int x = 0; x < 2; x++) {
-    for (int y = 0; y < 2; y++) {
-      for (int z = 0; z < 2; z++) {
+  for (int x = 0; x < 2; x++)
+  {
+    for (int y = 0; y < 2; y++)
+    {
+      for (int z = 0; z < 2; z++)
+      {
         Eigen::Vector3i current_idx = idx + Eigen::Vector3i(x, y, z);
         values[x][y][z] = GetDistance(current_idx);
       }
@@ -541,14 +607,14 @@ double fiesta::ESDFMap::GetDistWithGradTrilinear(Eigen::Vector3d pos,
 
 // region VISUALIZATION
 
-void fiesta::ESDFMap::GetPointCloud(sensor_msgs::PointCloud &m, int vis_lower_bound, int vis_upper_bound) {
+void fiesta::ESDFMap::GetPointCloud(sensor_msgs::PointCloud &m, int vis_lower_bound, int vis_upper_bound)
+{
   m.header.frame_id = "world";
   m.points.clear();
 #ifdef HASH_TABLE
-  for (int i = 1; i < count; i++) {
-    if (!Exist(Vox2Idx(vox_buffer_[i])) || vox_buffer_[i].z() < vis_lower_bound || vox_buffer_[i].z() > vis_upper_bound
-        || vox_buffer_[i].x() < min_vec_(0) || vox_buffer_[i].x() > max_vec_(0)
-        || vox_buffer_[i].y() < min_vec_(1) || vox_buffer_[i].y() > max_vec_(1))
+  for (int i = 1; i < count; i++)
+  {
+    if (!Exist(Vox2Idx(vox_buffer_[i])) || vox_buffer_[i].z() < vis_lower_bound || vox_buffer_[i].z() > vis_upper_bound || vox_buffer_[i].x() < min_vec_(0) || vox_buffer_[i].x() > max_vec_(0) || vox_buffer_[i].y() < min_vec_(1) || vox_buffer_[i].y() > max_vec_(1))
       continue;
 
     Eigen::Vector3d pos;
@@ -564,7 +630,8 @@ void fiesta::ESDFMap::GetPointCloud(sensor_msgs::PointCloud &m, int vis_lower_bo
 #else
   for (int x = min_vec_(0); x <= max_vec_(0); ++x)
     for (int y = min_vec_(1); y <= max_vec_(1); ++y)
-      for (int z = min_vec_(2); z <= max_vec_(2); ++z) {
+      for (int z = min_vec_(2); z <= max_vec_(2); ++z)
+      {
         if (!Exist(Vox2Idx(Eigen::Vector3i(x, y, z))) || z < vis_lower_bound || z > vis_upper_bound)
           continue;
 
@@ -581,7 +648,8 @@ void fiesta::ESDFMap::GetPointCloud(sensor_msgs::PointCloud &m, int vis_lower_bo
 #endif
 }
 
-inline std_msgs::ColorRGBA RainbowColorMap(double h) {
+inline std_msgs::ColorRGBA RainbowColorMap(double h)
+{
   std_msgs::ColorRGBA color;
   color.a = 1;
   // blend over HSV-values (more colors)
@@ -597,47 +665,56 @@ inline std_msgs::ColorRGBA RainbowColorMap(double h) {
   i = floor(h);
   f = h - i;
   if (!(i & 1))
-    f = 1 - f;  // if i is even
+    f = 1 - f; // if i is even
   m = v * (1 - s);
   n = v * (1 - s * f);
 
-  switch (i) {
-    case 6:
-    case 0:color.r = v;
-      color.g = n;
-      color.b = m;
-      break;
-    case 1:color.r = n;
-      color.g = v;
-      color.b = m;
-      break;
-    case 2:color.r = m;
-      color.g = v;
-      color.b = n;
-      break;
-    case 3:color.r = m;
-      color.g = n;
-      color.b = v;
-      break;
-    case 4:color.r = n;
-      color.g = m;
-      color.b = v;
-      break;
-    case 5:color.r = v;
-      color.g = m;
-      color.b = n;
-      break;
-    default:color.r = 1;
-      color.g = 0.5;
-      color.b = 0.5;
-      break;
+  switch (i)
+  {
+  case 6:
+  case 0:
+    color.r = v;
+    color.g = n;
+    color.b = m;
+    break;
+  case 1:
+    color.r = n;
+    color.g = v;
+    color.b = m;
+    break;
+  case 2:
+    color.r = m;
+    color.g = v;
+    color.b = n;
+    break;
+  case 3:
+    color.r = m;
+    color.g = n;
+    color.b = v;
+    break;
+  case 4:
+    color.r = n;
+    color.g = m;
+    color.b = v;
+    break;
+  case 5:
+    color.r = v;
+    color.g = m;
+    color.b = n;
+    break;
+  default:
+    color.r = 1;
+    color.g = 0.5;
+    color.b = 0.5;
+    break;
   }
 
   return color;
 }
 
 void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, int id,
-                                     Eigen::Vector4d color, double max_dist) {
+                                     Eigen::Vector4d color, double max_dist)
+{
   m.header.frame_id = "world";
   m.id = id;
   m.type = visualization_msgs::Marker::POINTS;
@@ -656,11 +733,10 @@ void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, i
   std_msgs::ColorRGBA c;
 #ifdef HASH_TABLE
   // TODO: low performance, need to be modified, which is also easy
-  for (int i = 1; i < count; i++) {
+  for (int i = 1; i < count; i++)
+  {
     int idx = Vox2Idx(vox_buffer_[i]);
-    if (vox_buffer_[i].z() != slice || distance_buffer_[idx] < 0 || distance_buffer_[idx] >= infinity_
-        || vox_buffer_[i].x() < min_vec_(0) || vox_buffer_[i].x() > max_vec_(0)
-        || vox_buffer_[i].y() < min_vec_(1) || vox_buffer_[i].y() > max_vec_(1))
+    if (vox_buffer_[i].z() != slice || distance_buffer_[idx] < 0 || distance_buffer_[idx] >= infinity_ || vox_buffer_[i].x() < min_vec_(0) || vox_buffer_[i].x() > max_vec_(0) || vox_buffer_[i].y() < min_vec_(1) || vox_buffer_[i].y() > max_vec_(1))
       continue;
 
     Eigen::Vector3d pos;
@@ -676,7 +752,8 @@ void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, i
   }
 #else
   for (int x = min_vec_(0); x <= max_vec_(0); ++x)
-    for (int y = min_vec_(1); y <= max_vec_(1); ++y) {
+    for (int y = min_vec_(1); y <= max_vec_(1); ++y)
+    {
       int z = slice;
       Eigen::Vector3i vox = Eigen::Vector3i(x, y, z);
       if (distance_buffer_[Vox2Idx(vox)] < 0 || distance_buffer_[Vox2Idx(vox)] >= infinity_)
@@ -702,7 +779,8 @@ void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, i
 
 // region HASH_TABLE
 #ifdef HASH_TABLE
-void fiesta::ESDFMap::IncreaseCapacity(int &old_size, int new_size) {
+void fiesta::ESDFMap::IncreaseCapacity(int &old_size, int new_size)
+{
   occupancy_buffer_.resize(new_size);
   distance_buffer_.resize(new_size);
   closest_obstacle_.resize(new_size);
@@ -710,7 +788,7 @@ void fiesta::ESDFMap::IncreaseCapacity(int &old_size, int new_size) {
   num_hit_.resize(new_size);
   num_miss_.resize(new_size);
 
-  std::fill(distance_buffer_.begin() + old_size, distance_buffer_.end(), (double) undefined_);
+  std::fill(distance_buffer_.begin() + old_size, distance_buffer_.end(), (double)undefined_);
   std::fill(occupancy_buffer_.begin() + old_size, occupancy_buffer_.end(), 0);
   std::fill(closest_obstacle_.begin() + old_size, closest_obstacle_.end(),
             Eigen::Vector3i(undefined_, undefined_, undefined_));
@@ -729,56 +807,61 @@ void fiesta::ESDFMap::IncreaseCapacity(int &old_size, int new_size) {
   old_size = new_size;
 }
 
-int fiesta::ESDFMap::FindAndInsert(Eigen::Vector3i hash_key) {
+int fiesta::ESDFMap::FindAndInsert(Eigen::Vector3i hash_key)
+{
 #ifdef BLOCK
   if (count + block_size_ > reserve_size_)
     IncreaseCapacity(reserve_size_, reserve_size_ * 2);
 #ifdef BITWISE
-  int idx_in_block = ((hash_key.x() & (block_ - 1)) << block_bit_ << block_bit_)
-      + ((hash_key.y() & (block_ - 1)) << block_bit_)
-      + (hash_key.z() & (block_ - 1));
-  Eigen::Vector3i block_id = hash_key.unaryExpr([&](const int x) { return x >> block_bit_; });
+  int idx_in_block = ((hash_key.x() & (block_ - 1)) << block_bit_ << block_bit_) + ((hash_key.y() & (block_ - 1)) << block_bit_) + (hash_key.z() & (block_ - 1));
+  Eigen::Vector3i block_id = hash_key.unaryExpr([&](const int x)
+                                                { return x >> block_bit_; });
 #else
-  int idx_in_block = (hash_key.x() % block_ + block_) % block_ * block_ * block_
-                     + (hash_key.y() % block_ + block_) % block_ * block_
-                     + (hash_key.z() % block_ + block_) % block_;
-    Eigen::Vector3i block_id = hash_key.unaryExpr([&](const int x) { return x / block_ - (x % block_ < 0); });
+  int idx_in_block = (hash_key.x() % block_ + block_) % block_ * block_ * block_ + (hash_key.y() % block_ + block_) % block_ * block_ + (hash_key.z() % block_ + block_) % block_;
+  Eigen::Vector3i block_id = hash_key.unaryExpr([&](const int x)
+                                                { return x / block_ - (x % block_ < 0); });
 #endif
   auto tmp = hash_table_.find(block_id);
 
-  if (tmp == hash_table_.end()) {
+  if (tmp == hash_table_.end())
+  {
     hash_table_.insert(std::make_pair(block_id, count));
 #ifdef BITWISE
-    block_id = block_id.unaryExpr([&](const int x) { return x << block_bit_; });
+    block_id = block_id.unaryExpr([&](const int x)
+                                  { return x << block_bit_; });
 #else
     block_id = block_id * block_;
 #endif
     for (int i = 0; i < block_; i++)
       for (int j = 0; j < block_; j++)
-        for (int k = 0; k < block_; k++) {
+        for (int k = 0; k < block_; k++)
+        {
           vox_buffer_[count++] = block_id + Eigen::Vector3i(i, j, k);
         }
     return count - block_size_ + idx_in_block;
-  } else {
+  }
+  else
+  {
     return tmp->second + idx_in_block;
   }
 
 #else
 
   if (count >= reserve_size_)
-      IncreaseCapacity(reserve_size_, reserve_size_ * 2);
+    IncreaseCapacity(reserve_size_, reserve_size_ * 2);
   auto tmp = hash_table_.find(hashKey);
 
-  if (tmp == hash_table_.end()) {
-      hash_table_.insert(std::make_pair(hashKey, count));
-      vox_buffer_[count] = hashKey;
-      return count++;
-  } else {
-      return tmp->second;
+  if (tmp == hash_table_.end())
+  {
+    hash_table_.insert(std::make_pair(hashKey, count));
+    vox_buffer_[count] = hashKey;
+    return count++;
   }
-
-
+  else
+  {
+    return tmp->second;
   }
+}
 #endif
 }
 
@@ -786,20 +869,21 @@ int fiesta::ESDFMap::FindAndInsert(Eigen::Vector3i hash_key) {
 
 // endregion
 
-
 //region LOCAL vs GLOBAL
 
-void fiesta::ESDFMap::SetUpdateRange(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos, bool new_vec) {
+void fiesta::ESDFMap::SetUpdateRange(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos, bool new_vec)
+{
 #ifndef HASH_TABLE
   min_pos(0) = std::max(min_pos(0), min_range_(0));
-    min_pos(1) = std::max(min_pos(1), min_range_(1));
-    min_pos(2) = std::max(min_pos(2), min_range_(2));
+  min_pos(1) = std::max(min_pos(1), min_range_(1));
+  min_pos(2) = std::max(min_pos(2), min_range_(2));
 
-    max_pos(0) = std::min(max_pos(0), max_range_(0));
-    max_pos(1) = std::min(max_pos(1), max_range_(1));
-    max_pos(2) = std::min(max_pos(2), max_range_(2));
+  max_pos(0) = std::min(max_pos(0), max_range_(0));
+  max_pos(1) = std::min(max_pos(1), max_range_(1));
+  max_pos(2) = std::min(max_pos(2), max_range_(2));
 #endif
-  if (new_vec) {
+  if (new_vec)
+  {
     last_min_vec_ = min_vec_;
     last_max_vec_ = max_vec_;
   }
@@ -809,7 +893,8 @@ void fiesta::ESDFMap::SetUpdateRange(Eigen::Vector3d min_pos, Eigen::Vector3d ma
       max_vec_);
 }
 
-void fiesta::ESDFMap::SetOriginalRange() {
+void fiesta::ESDFMap::SetOriginalRange()
+{
 #ifdef HASH_TABLE
   min_vec_ << -infinity_, -infinity_, -infinity_;
   max_vec_ << +infinity_, +infinity_, +infinity_;
@@ -817,33 +902,37 @@ void fiesta::ESDFMap::SetOriginalRange() {
   last_max_vec_ = max_vec_;
 #else
   min_vec_ << 0, 0, 0;
-    max_vec_ << grid_size_(0) - 1, grid_size_(1) - 1, grid_size_(2) - 1;
-    last_min_vec_ = min_vec_;
-    last_max_vec_ = max_vec_;
+  max_vec_ << grid_size_(0) - 1, grid_size_(1) - 1, grid_size_(2) - 1;
+  last_min_vec_ = min_vec_;
+  last_max_vec_ = max_vec_;
 #endif
 }
 
 #ifndef PROBABILISTIC
-void SetAway(){
-    SetAway(min_vec_, max_vec_);
-  }
+void SetAway()
+{
+  SetAway(min_vec_, max_vec_);
+}
 
-  void SetAway(Eigen::Vector3i left, Eigen::Vector3i right) {
-      for (int i = left(0); i <= right(0); i++)
-          for (int j = left(1); j <= right(1); j++)
-              for (int k = left(2); k <= right(2); k++)
-                  occupancy_buffer_[Vox2Idx(Eigen::Vector3i(i, j, k))] |= 2;
-  }
-  void SetBack(){
-    SetBack(min_vec_, max_vec_);
-  }
-  void SetBack(Eigen::Vector3i left, Eigen::Vector3i right) {
-      for (int i = left(0); i <= right(0); i++)
-          for (int j = left(1); j <= right(1); j++)
-              for (int k = left(2); k <= right(2); k++)
-                  if (occupancy_buffer_[Vox2Idx(Eigen::Vector3i(i, j, k))] >= 2)
-                      SetOccupancy(Eigen::Vector3i(i, j, k), 0);
-  }
+void SetAway(Eigen::Vector3i left, Eigen::Vector3i right)
+{
+  for (int i = left(0); i <= right(0); i++)
+    for (int j = left(1); j <= right(1); j++)
+      for (int k = left(2); k <= right(2); k++)
+        occupancy_buffer_[Vox2Idx(Eigen::Vector3i(i, j, k))] |= 2;
+}
+void SetBack()
+{
+  SetBack(min_vec_, max_vec_);
+}
+void SetBack(Eigen::Vector3i left, Eigen::Vector3i right)
+{
+  for (int i = left(0); i <= right(0); i++)
+    for (int j = left(1); j <= right(1); j++)
+      for (int k = left(2); k <= right(2); k++)
+        if (occupancy_buffer_[Vox2Idx(Eigen::Vector3i(i, j, k))] >= 2)
+          SetOccupancy(Eigen::Vector3i(i, j, k), 0);
+}
 #endif
 
 //endregion
@@ -853,12 +942,14 @@ void SetAway(){
 // region DEBUG
 
 // only for test, check whether consistent
-bool fiesta::ESDFMap::CheckConsistency() {
+bool fiesta::ESDFMap::CheckConsistency()
+{
 #ifdef HASH_TABLE
-  for (int ii = 1; ii < count; ii++) {
+  for (int ii = 1; ii < count; ii++)
+  {
     int vox = Vox2Idx(vox_buffer_[ii]);
-    if (prev_[vox] != undefined_ && next_[prev_[vox]] != vox
-        || next_[vox] != undefined_ && prev_[next_[vox]] != vox) {
+    if (prev_[vox] != undefined_ && next_[prev_[vox]] != vox || next_[vox] != undefined_ && prev_[next_[vox]] != vox)
+    {
       std::cout << vox_buffer_[ii](0) << ' ' << vox_buffer_[ii](1) << ' ' << vox_buffer_[ii](2) << ' ' << vox
                 << std::endl;
       std::cout << prev_[vox] << ' ' << next_[prev_[vox]] << ' ' << next_[vox] << ' ' << prev_[next_[vox]]
@@ -870,39 +961,40 @@ bool fiesta::ESDFMap::CheckConsistency() {
 
       return false;
     }
-    if (prev_[vox] == undefined_ && distance_buffer_[vox] >= 0
-        && head_[Vox2Idx(closest_obstacle_[vox])] != vox)
+    if (prev_[vox] == undefined_ && distance_buffer_[vox] >= 0 && head_[Vox2Idx(closest_obstacle_[vox])] != vox)
       return false;
   }
 
 #else
 
   for (int x = 0; x < grid_size_(0); ++x)
-      for (int y = 0; y < grid_size_(1); ++y)
-        for (int z = 0; z < grid_size_(2); ++z) {
-          int vox = Vox2Idx(Eigen::Vector3i(x, y, z));
-          if (prev_[vox] != undefined_ && next_[prev_[vox]] != vox ||
-              next_[vox] != undefined_ && prev_[next_[vox]] != vox) {
-            std::cout << x << ' ' << y << ' ' << z << ' ' << vox << std::endl;
-            std::cout << prev_[vox] << ' ' << next_[prev_[vox]] << ' ' << next_[vox] << ' ' << prev_[next_[vox]]
-                      << std::endl;
-            std::cout << Vox2Idx(closest_obstacle_[next_[prev_[vox]]]) << ' ' << Vox2Idx(closest_obstacle_[vox])
-                      << std::endl;
-            std::cout << Vox2Idx(closest_obstacle_[prev_[vox]]) << ' ' << Vox2Idx(closest_obstacle_[next_[vox]])
-                      << std::endl;
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+      {
+        int vox = Vox2Idx(Eigen::Vector3i(x, y, z));
+        if (prev_[vox] != undefined_ && next_[prev_[vox]] != vox ||
+            next_[vox] != undefined_ && prev_[next_[vox]] != vox)
+        {
+          std::cout << x << ' ' << y << ' ' << z << ' ' << vox << std::endl;
+          std::cout << prev_[vox] << ' ' << next_[prev_[vox]] << ' ' << next_[vox] << ' ' << prev_[next_[vox]]
+                    << std::endl;
+          std::cout << Vox2Idx(closest_obstacle_[next_[prev_[vox]]]) << ' ' << Vox2Idx(closest_obstacle_[vox])
+                    << std::endl;
+          std::cout << Vox2Idx(closest_obstacle_[prev_[vox]]) << ' ' << Vox2Idx(closest_obstacle_[next_[vox]])
+                    << std::endl;
 
-            return false;
-          }
-          if (prev_[vox] == undefined_ && distance_buffer_[vox] >= 0
-              && head_[Vox2Idx(closest_obstacle_[vox])] != vox)
-            return false;
+          return false;
         }
+        if (prev_[vox] == undefined_ && distance_buffer_[vox] >= 0 && head_[Vox2Idx(closest_obstacle_[vox])] != vox)
+          return false;
+      }
 #endif
   return true;
 }
 
 // only for test, check between Ground Truth calculated by k-d tree
-float fiesta::ESDFMap::CheckWithGroundTruth() {
+float fiesta::ESDFMap::CheckWithGroundTruth()
+{
 #ifdef HASH_TABLE
   Eigen::Vector3i ma = Eigen::Vector3i(0, 0, 0), mi = Eigen::Vector3i(0, 0, 0);
   //        ESDFMap *esdf_map_ = new ESDFMap(Eigen::Vector3d(0, 0, 0), resolution, 10000000);
@@ -915,18 +1007,24 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
   cloud_->points.resize(cloud_->width * cloud_->height);
   int tot_ = 0;
   for (int ii = 1; ii < count; ii++)
-    if (Exist(ii)) {
+    if (Exist(ii))
+    {
       cloud_->points[tot_].x = vox_buffer_[ii](0);
       cloud_->points[tot_].y = vox_buffer_[ii](1);
       cloud_->points[tot_].z = vox_buffer_[ii](2);
       tot_++;
-      if (vox_buffer_[ii](0) > ma(0)) ma(0) = vox_buffer_[ii](0);
-      if (vox_buffer_[ii](1) > ma(1)) ma(1) = vox_buffer_[ii](1);
-      if (vox_buffer_[ii](2) > ma(2)) ma(2) = vox_buffer_[ii](2);
-      if (vox_buffer_[ii](0) < mi(0)) mi(0) = vox_buffer_[ii](0);
-      if (vox_buffer_[ii](1) < mi(1)) mi(1) = vox_buffer_[ii](1);
-      if (vox_buffer_[ii](2) < mi(2)) mi(2) = vox_buffer_[ii](2);
-
+      if (vox_buffer_[ii](0) > ma(0))
+        ma(0) = vox_buffer_[ii](0);
+      if (vox_buffer_[ii](1) > ma(1))
+        ma(1) = vox_buffer_[ii](1);
+      if (vox_buffer_[ii](2) > ma(2))
+        ma(2) = vox_buffer_[ii](2);
+      if (vox_buffer_[ii](0) < mi(0))
+        mi(0) = vox_buffer_[ii](0);
+      if (vox_buffer_[ii](1) < mi(1))
+        mi(1) = vox_buffer_[ii](1);
+      if (vox_buffer_[ii](2) < mi(2))
+        mi(2) = vox_buffer_[ii](2);
     }
   std::cout << ma(0) << ' ' << ma(1) << ' ' << ma(2) << ' ' << mi(0) << ' ' << mi(1) << ' ' << mi(2) << std::endl;
   pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
@@ -937,8 +1035,10 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
   double ems1 = 0, ems2 = 0, max1 = 0, max2 = 0;
   int a[32];
   std::fill(a, a + 32, 0);
-  for (int ii = 1; ii < count; ii++) {
-    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_) {
+  for (int ii = 1; ii < count; ii++)
+  {
+    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_)
+    {
       kdtree.nearestKSearch(pcl::PointXYZ(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)), 1,
                             pointIdxNKNSearch, pointNKNSquaredDistance);
       double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
@@ -952,11 +1052,13 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
       //
       //                    return false;
       double error = distance_buffer_[ii] - tmp;
-      if (error > 1e-3) {
+      if (error > 1e-3)
+      {
         cnt1++;
-        a[(int) (error / 0.1)]++;
+        a[(int)(error / 0.1)]++;
       }
-      if (error < -1e-3) {
+      if (error < -1e-3)
+      {
         cnt3++;
       }
       ems1 += distance_buffer_[ii] - tmp;
@@ -967,93 +1069,231 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
     }
   }
 
-  std::cout << count <<"resolutioin is "<<resolution_<< std::endl;
+  std::cout << count << "resolutioin is " << resolution_ << std::endl;
   std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
   std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
   std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
   std::cout << ems2 << " / " << cnt2 << " = " << ems2 / cnt2 << std::endl;
   std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++)
+  {
     std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
   }
 
 #else
   //        ESDFMap *esdf_map_ = new ESDFMap(Eigen::Vector3d(0, 0, 0), resolution, 10000000);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    cloud->width = 0;
-    cloud->height = 1;
-    for (int x = 0; x < grid_size_(0); ++x)
-      for (int y = 0; y < grid_size_(1); ++y)
-        for (int z = 0; z < grid_size_(2); ++z)
-          if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
-            cloud->width++;
-    cloud->points.resize(cloud->width * cloud->height);
-    int tot = 0;
-    for (int x = 0; x < grid_size_(0); ++x)
-      for (int y = 0; y < grid_size_(1); ++y)
-        for (int z = 0; z < grid_size_(2); ++z)
-          if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z)))) {
-            cloud->points[tot].x = x;
-            cloud->points[tot].y = y;
-            cloud->points[tot].z = z;
-            tot++;
-          }
-    pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
-    kdtree.setInputCloud(cloud);
-    std::vector<int> pointIdxNKNSearch(1);
-    std::vector<float> pointNKNSquaredDistance(1);
-    int cnt1 = 0, cnt2 = 0, cnt3 = 0;
-    double ems1 = 0, ems2 = 0, max1 = 0, max2 = 0;
-    int a[32];
-    std::fill(a, a + 32, 0);
-    for (int x = 0; x < grid_size_(0); ++x)
-      for (int y = 0; y < grid_size_(1); ++y)
-        for (int z = 0; z < grid_size_(2); ++z) {
-          int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
-          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_) {
-            kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
-                                  pointIdxNKNSearch, pointNKNSquaredDistance);
-            double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
-//                if (fabs(distance_buffer_[ii] - tmp) > 1e-3) {
-//                    std::cout << vox_buffer_[ii](0) << '\t' << vox_buffer_[ii](1) << '\t' << vox_buffer_[ii](2) << '\n';
-//                    std::cout << cloud_->points[pointIdxNKNSearch[0]].x << '\t'
-//                              << cloud_->points[pointIdxNKNSearch[0]].y << '\t'
-//                              << cloud_->points[pointIdxNKNSearch[0]].z << '\n';
-//
-//                    std::cout << distance_buffer_[ii] << '\t' << tmp << '\n';
-//
-//                    return false;
-            double error = distance_buffer_[ii] - tmp;
-            if (error > 1e-3) {
-              cnt1++;
-              a[(int) (error / 0.1)]++;
-            }
-            if (error < -1e-3) {
-              cnt3++;
-            }
-            ems1 += distance_buffer_[ii] - tmp;
-            ems2 += (distance_buffer_[ii] - tmp) * (distance_buffer_[ii] - tmp);
-            cnt2++;
-            max1 = std::max(distance_buffer_[ii] - tmp, max1);
-//                }
-          }
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  cloud->width = 0;
+  cloud->height = 1;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+          cloud->width++;
+  cloud->points.resize(cloud->width * cloud->height);
+  int tot = 0;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+        {
+          cloud->points[tot].x = x;
+          cloud->points[tot].y = y;
+          cloud->points[tot].z = z;
+          tot++;
         }
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  kdtree.setInputCloud(cloud);
+  std::vector<int> pointIdxNKNSearch(1);
+  std::vector<float> pointNKNSquaredDistance(1);
+  int cnt1 = 0, cnt2 = 0, cnt3 = 0;
+  double ems1 = 0, ems2 = 0, max1 = 0, max2 = 0;
+  int a[32];
+  std::fill(a, a + 32, 0);
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+      {
+        int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
+        if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_)
+        {
+          kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
+                                pointIdxNKNSearch, pointNKNSquaredDistance);
+          double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
+          //                if (fabs(distance_buffer_[ii] - tmp) > 1e-3) {
+          //                    std::cout << vox_buffer_[ii](0) << '\t' << vox_buffer_[ii](1) << '\t' << vox_buffer_[ii](2) << '\n';
+          //                    std::cout << cloud_->points[pointIdxNKNSearch[0]].x << '\t'
+          //                              << cloud_->points[pointIdxNKNSearch[0]].y << '\t'
+          //                              << cloud_->points[pointIdxNKNSearch[0]].z << '\n';
+          //
+          //                    std::cout << distance_buffer_[ii] << '\t' << tmp << '\n';
+          //
+          //                    return false;
+          double error = distance_buffer_[ii] - tmp;
+          if (error > 1e-3)
+          {
+            cnt1++;
+            a[(int)(error / 0.1)]++;
+          }
+          if (error < -1e-3)
+          {
+            cnt3++;
+          }
+          ems1 += distance_buffer_[ii] - tmp;
+          ems2 += (distance_buffer_[ii] - tmp) * (distance_buffer_[ii] - tmp);
+          cnt2++;
+          max1 = std::max(distance_buffer_[ii] - tmp, max1);
+          //                }
+        }
+      }
 
-  std::cout << "resolutioin is "<<resolution_<< std::endl;
-    std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
-    std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
-    std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
-    std::cout <<"sqrt"<< ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
-    std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
-    // for (int i = 0; i < 32; i++) {
-    //   std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
-    // }
+  std::cout << "resolutioin is " << resolution_ << std::endl;
+  std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
+  std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
+  std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
+  std::cout << "sqrt" << ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
+  std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
+  // for (int i = 0; i < 32; i++) {
+  //   std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
+  // }
 
 #endif
   // return true;
   return sqrt(ems2 / cnt2);
 }
 
+float fiesta::ESDFMap::get_gt_sdf()
+{
+
+#ifdef HASH_TABLE
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_(new pcl::PointCloud<pcl::PointXYZ>);
+  cloud_->width = 0;
+  cloud_->height = 1;
+  for (int ii = 1; ii < count; ii++)
+    if (Exist(ii))
+      cloud_->width++;
+  cloud_->points.resize(cloud_->width * cloud_->height);
+  int tot_ = 0;
+  for (int ii = 1; ii < count; ii++)
+    if (Exist(ii))
+    {
+      cloud_->points[tot_].x = vox_buffer_[ii](0);
+      cloud_->points[tot_].y = vox_buffer_[ii](1);
+      cloud_->points[tot_].z = vox_buffer_[ii](2);
+      tot_++;
+    }
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  kdtree.setInputCloud(cloud_);
+  std::vector<int> pointIdxNKNSearch(1);
+  std::vector<float> pointNKNSquaredDistance(1);
+  for (int ii = 1; ii < count; ii++)
+  {
+      kdtree.nearestKSearch(pcl::PointXYZ(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)), 1,
+                            pointIdxNKNSearch, pointNKNSquaredDistance);
+      double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
+  }
+#else
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  cloud->width = 0;
+  cloud->height = 1;
+  cloud->width = 0;
+  cloud->height = 1;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+          cloud->width++;
+  cloud->points.resize(cloud->width * cloud->height);
+  int tot = 0;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+        {
+          cloud->points[tot].x = x;
+          cloud->points[tot].y = y;
+          cloud->points[tot].z = z;
+          tot++;
+        }
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  kdtree.setInputCloud(cloud);
+  std::vector<int> pointIdxNKNSearch(1);
+  std::vector<float> pointNKNSquaredDistance(1);
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+      {
+        int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
+//        if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_)
+        {
+          kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
+                                pointIdxNKNSearch, pointNKNSquaredDistance);
+          double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
+          gt_edf[ii] = tmp;
+        }
+//        else {
+//          gt_edf[ii] = -1;
+//        }
+      }
+
+#endif
+  return 0.1;
+}
+float fiesta::ESDFMap::score_correlation_sdf()
+{
+#ifdef HASH_TABLE
+  printf("not implemented!");
+#else
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  cloud->width = 0;
+  cloud->height = 1;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+          cloud->width++;
+  cloud->points.resize(cloud->width * cloud->height);
+  int tot = 0;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+        if (Exist(Vox2Idx(Eigen::Vector3i(x, y, z))))
+        {
+          cloud->points[tot].x = x;
+          cloud->points[tot].y = y;
+          cloud->points[tot].z = z;
+          tot++;
+        }
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+  kdtree.setInputCloud(cloud);
+  std::vector<int> pointIdxNKNSearch(1);
+  std::vector<float> pointNKNSquaredDistance(1);
+
+  float score = 0;
+  for (int x = 0; x < grid_size_(0); ++x)
+    for (int y = 0; y < grid_size_(1); ++y)
+      for (int z = 0; z < grid_size_(2); ++z)
+      {
+        int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
+//        if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_)
+        {
+          kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
+                                pointIdxNKNSearch, pointNKNSquaredDistance);
+          double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
+//          if(gt_edf[ii]<0)
+//            continue;
+
+          float diff = tmp- gt_edf[ii];
+          score += diff;
+        }
+//        else {
+//          // continue
+//        }
+      }
+
+#endif
+  return score;
+}
 // endregion
 
 #endif

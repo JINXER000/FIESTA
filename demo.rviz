@@ -59,13 +59,13 @@ Visualization Manager:
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
         Max Value: 2.9000000953674316
-        Min Value: -0.8999999761581421
+        Min Value: -2.5
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud
-      Color: 255; 255; 255
-      Color Transformer: AxisColor
+      Color: 0; 0; 0
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -78,7 +78,7 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.05000000074505806
+      Size (m): 0.10000000149011612
       Style: Squares
       Topic: /fiesta/ESDFMap/occ_pc
       Unreliable: false
@@ -155,25 +155,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 37.30701446533203
+      Distance: 21.36224365234375
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.1649658679962158
-        Y: 0.20187023282051086
-        Z: 0.44790634512901306
+        X: -12.09742259979248
+        Y: 7.882071495056152
+        Z: 4.25295877456665
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.1547942161560059
+      Pitch: 0.7947946786880493
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.138718843460083
+      Yaw: 1.258708119392395
     Saved: ~
 Window Geometry:
   Displays:

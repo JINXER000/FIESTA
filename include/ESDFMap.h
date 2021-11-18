@@ -45,7 +45,7 @@ class ESDFMap {
   };
 
 
- private:
+public:
   // parameters & method for occupancy information updating
   double prob_hit_log_, prob_miss_log_, clamp_min_log_, clamp_max_log_, min_occupancy_log_;
   const double Logit(const double &x) const;
@@ -79,7 +79,7 @@ class ESDFMap {
   int grid_size_yz_;
 #endif
 
-// data are saved in vector
+  // data are saved in vector
 #ifdef PROBABILISTIC
   std::vector<double> occupancy_buffer_;  // 0 is free, 1 is occupied
 #else
@@ -95,7 +95,7 @@ class ESDFMap {
   std::queue<QueueElement> update_queue_;
   std::queue<QueueElement> occupancy_queue_;
 
-// Map Properties
+  // Map Properties
   Eigen::Vector3d origin_;
   int reserved_idx_4_undefined_;
   int total_time_ = 0;
@@ -108,7 +108,7 @@ class ESDFMap {
   void DeleteFromList(int link, int idx);
   void InsertIntoList(int link, int idx);
 
- public:
+public:
 #ifdef HASH_TABLE
   ESDFMap(Eigen::Vector3d origin, double resolution, int reserve_size = 0);
 #else
@@ -129,22 +129,22 @@ class ESDFMap {
   bool UpdateOccupancy(bool global_map);
   void UpdateESDF();
 
-// Occupancy Management
+  // Occupancy Management
   int SetOccupancy(Eigen::Vector3d pos, int occ);
   int SetOccupancy(Eigen::Vector3i vox, int occ);
   int GetOccupancy(Eigen::Vector3d pos);
   int GetOccupancy(Eigen::Vector3i pos_id);
 
-// Distance Field Management
+  // Distance Field Management
   double GetDistance(Eigen::Vector3d pos);
   double GetDistance(Eigen::Vector3i vox);
   double GetDistWithGradTrilinear(Eigen::Vector3d pos, Eigen::Vector3d &grad);
 
-// Visualization
+  // Visualization
   void GetPointCloud(sensor_msgs::PointCloud &m, int vis_lower_bound, int vis_upper_bound);
   void GetSliceMarker(visualization_msgs::Marker &m, int slice, int id, Eigen::Vector4d color, double max_dist);
 
-// Local Range
+  // Local Range
   void SetUpdateRange(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos, bool new_vec = true);
   void SetOriginalRange();
 
@@ -163,6 +163,11 @@ class ESDFMap {
   float CheckWithGroundTruth();
 #endif
 
+  float get_gt_sdf();
+  float score_correlation_sdf();
+  // change rate
+  float *gt_edf;
+  pcl::PointCloud<pcl::PointXYZ>::Ptr occu_cld;
 };
 }
 
