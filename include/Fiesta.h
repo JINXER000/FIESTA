@@ -24,6 +24,7 @@
 #include <sensor_msgs/PointCloud.h>
 #include <unordered_set>
 #include <time_recorder.h>
+#include "std_srvs/SetBool.h"
 
 namespace fiesta
 {
@@ -143,8 +144,9 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node)
       node.createTimer(ros::Duration(parameters_.update_esdf_every_n_sec_),
                        &Fiesta::UpdateEsdfEvent, this);
 
+  std::string hector_log_name = "/home/joseph/yzchen_ws/UAV/cpc_ws_4dataset/src/cpc_aux_mapping/logs/fiesta-hector-"+std::to_string(parameters_.mes_interval)+"s.txt";
+  sdf_rcd = new tm_rcd(hector_log_name);
   occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
-  sdf_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf_8s.txt");
   rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_rms005-32.txt");
 
   std::cout << "initialize done\n"
@@ -641,7 +643,11 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
   if (tm1_diff < ros::Duration(0.25) && tm1_diff > ros::Duration(-0.25) && !t1_done) // with t1
   {
     std::cout << "-------now is t1 " << t1 << " cur stamp is " << cur_stamp << std::endl;
-
+    //pause rosbag
+    std_srvs::SetBool pausesrv;
+    pausesrv.request.data = true;
+    pausesrv.response.message ="rosbag paused!";
+    ros::service::call("/my_bag/pause_playback",pausesrv);
     auto start = std::chrono::steady_clock::now();
 #ifndef PROBABILISTIC
     timing::Timer handlePCTimer("handlePointCloud");
@@ -690,12 +696,22 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
 
     //  compute gt ESDF in a given scale
    esdf_map_->get_gt_sdf();
-    t2 = ros::Time::now() + ros::Duration(8);
+    t2 = ros::Time::now() + ros::Duration(parameters_.mes_interval);
     t1_done = true;
+        //resume rosbag
+    std_srvs::SetBool resumesrv;
+    resumesrv.request.data = false;
+    resumesrv.response.message ="rosbag resume!";
+    ros::service::call("/my_bag/pause_playback",resumesrv);
   }
   else if (tm2_diff < ros::Duration(0.25) && tm2_diff > ros::Duration(-0.25) && !t2_done) // with t2
   {
     std::cout << "------now is t2 " << t2 << " cur stamp is " << cur_stamp << std::endl;
+        //pause rosbag
+    std_srvs::SetBool pausesrv;
+    pausesrv.request.data = true;
+    pausesrv.response.message ="rosbag paused!";
+    ros::service::call("/my_bag/pause_playback",pausesrv);
     auto start = std::chrono::steady_clock::now();
 #ifndef PROBABILISTIC
     timing::Timer handlePCTimer("handlePointCloud");
@@ -748,6 +764,11 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
    double change_rate = esdf_map_->score_correlation_sdf();
    sdf_rcd->record(change_rate, "change_rate");
     t2_done = true;
+        //resume rosbag
+    std_srvs::SetBool resumesrv;
+    resumesrv.request.data = false;
+    resumesrv.response.message ="rosbag resume!";
+    ros::service::call("/my_bag/pause_playback",resumesrv);
   }
 
   //    ros::Time t2 = ros::Time::now();

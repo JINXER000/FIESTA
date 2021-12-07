@@ -162,6 +162,8 @@ struct Parameters {
   // transforms
   Eigen::Matrix4d T_B_C_, T_D_B_;
 
+  float mes_interval;
+
 
   void SetParameters(const ros::NodeHandle &node);
 };

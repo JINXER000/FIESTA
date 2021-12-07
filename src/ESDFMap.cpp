@@ -1284,7 +1284,7 @@ float fiesta::ESDFMap::score_correlation_sdf()
 //            continue;
 
           float diff = tmp- gt_edf[ii];
-          score += diff;
+          score += fabs(diff);
         }
 //        else {
 //          // continue
