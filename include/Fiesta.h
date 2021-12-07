@@ -144,7 +144,7 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node)
                        &Fiesta::UpdateEsdfEvent, this);
 
   occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
-  sdf_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf_6s.txt");
+  sdf_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf_8s.txt");
   rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_rms005-32.txt");
 
   std::cout << "initialize done\n"
@@ -636,7 +636,7 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
 
   }
   ros::Duration tm1_diff = cur_stamp - t1;
-  ros::Duration tm2_diff = cur_stamp - t2;
+  ros::Duration tm2_diff = ros::Time::now() - t2;
   std::cout << " -------tm1_diff: " << tm1_diff << " tm2_diff is " << tm2_diff << std::endl;
   if (tm1_diff < ros::Duration(0.25) && tm1_diff > ros::Duration(-0.25) && !t1_done) // with t1
   {
@@ -689,8 +689,8 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
 
 
     //  compute gt ESDF in a given scale
-//    esdf_map_->get_gt_sdf();
-    t2 = cur_stamp + ros::Duration(6);
+   esdf_map_->get_gt_sdf();
+    t2 = ros::Time::now() + ros::Duration(8);
     t1_done = true;
   }
   else if (tm2_diff < ros::Duration(0.25) && tm2_diff > ros::Duration(-0.25) && !t2_done) // with t2
@@ -745,8 +745,8 @@ void Fiesta<DepthMsgType, PoseMsgType>::UpdateEsdfEvent(const ros::TimerEvent & 
     }
 
 
-//    double change_rate = esdf_map_->score_correlation_sdf();
-//    sdf_rcd->record(change_rate, "change_rate");
+   double change_rate = esdf_map_->score_correlation_sdf();
+   sdf_rcd->record(change_rate, "change_rate");
     t2_done = true;
   }
 
