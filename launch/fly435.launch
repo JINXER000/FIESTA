@@ -1,19 +1,19 @@
 <launch>
-    <node pkg="fiesta" type="test_changerate" name="fiesta" output="screen"
+    <node pkg="fiesta" type="test_cam" name="fiesta" output="screen"
           required="true">
 
-        <param name="resolution" value="0.2"/>
+        <param name="resolution" value="0.05"/>
         <param name="update_esdf_every_n_sec" value="0.1"/>
 
         <!--Hash Table only-->
         <param name="reserved_size" value="1000000"/>
 
         <!--Array only-->
-        <param name="lx" value="-50.0"/>
-        <param name="ly" value="-50.0"/>
-        <param name="lz" value="-3"/>
-        <param name="rx" value="+50.0"/>
-        <param name="ry" value="+50.0"/>
+        <param name="lx" value="-10.0"/>
+        <param name="ly" value="-10.0"/>
+        <param name="lz" value="-1"/>
+        <param name="rx" value="+10.0"/>
+        <param name="ry" value="+10.0"/>
         <param name="rz" value="+3"/>
 
         <!-- raycasting parameters -->
@@ -25,10 +25,10 @@
 
 
         <!-- needed when using depth image-->
-        <!--        <param name="center_x" value="323.120483"/>-->
-        <!--        <param name="center_y" value="236.743210"/>-->
-        <!--        <param name="focal_x" value="385.754486"/>-->
-        <!--        <param name="focal_y" value="385.754486"/>-->
+               <param name="center_x" value="320"/>
+               <param name="center_y" value="240"/>
+               <param name="focal_x" value="381.2667"/>
+               <param name="focal_y" value="381.2667"/>
 
         <!-- probabilistic grid map -->
         <param name="p_hit" value="0.70"/>
@@ -58,13 +58,13 @@
         <param name="visualize_every_n_updates" value="1"/>
         <param name="slice_vis_max_dist" value="2.0"/>
         <!-- relative to the lz if array is used, relative to the origin if hash table is used -->
-        <param name="slice_vis_level" value="1.6"/>
+        <param name="slice_vis_level" value="0"/>
         <param name="vis_lower_bound" value="0"/>
         <param name="vis_upper_bound" value="+10"/>
 
         <!-- subsribe source -->
-        <remap from="~depth" to="/velodyne_points"/>
-        <remap from="~transform" to="/ground_truth/state"/>
+        <remap from="~depth" to="/d435i/depth/image_rect_raw"/>
+        <remap from="~transform" to="/vrpn_client_node/amo/pose"/>
     </node>
 
     <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find fiesta)/demo.rviz" />

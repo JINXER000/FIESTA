@@ -58,8 +58,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 2.9000000953674316
-        Min Value: -0.8999999761581421
+        Max Value: 2.9749999046325684
+        Min Value: 0.4749999940395355
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -127,6 +127,21 @@ Visualization Manager:
       Topic: /ground_truth/state
       Unreliable: false
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
+      Topic: /vrpn_client_node/amo/pose
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 127
@@ -155,7 +170,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 37.30701446533203
+      Distance: 7.080521583557129
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -170,10 +185,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.1547942161560059
+      Pitch: 0.6247950792312622
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.138718843460083
+      Yaw: 3.8687334060668945
     Saved: ~
 Window Geometry:
   Displays:

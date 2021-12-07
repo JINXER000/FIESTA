@@ -167,6 +167,7 @@ void Fiesta<DepthMsgType, PoseMsgType>::Visualization(ESDFMap *esdf_map, bool gl
           esdf_map->GetSliceMarker(slice_marker, parameters_.slice_vis_level_, 100,
                                    Eigen::Vector4d(0, 1.0, 0, 1), parameters_.slice_vis_max_dist_);
           slice_pub_.publish(slice_marker);
+          std::cout<<"ESDF at level "<<parameters_.slice_vis_level_<<" size is "<< slice_marker.points.size()<<std::endl;
      }
      if (!text.empty()) {
           visualization_msgs::Marker marker;

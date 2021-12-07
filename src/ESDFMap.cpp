@@ -676,12 +676,14 @@ void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, i
   }
 #else
   for (int x = min_vec_(0); x <= max_vec_(0); ++x)
-    for (int y = min_vec_(1); y <= max_vec_(1); ++y) {
-      int z = slice;
+    for (int y = min_vec_(1); y <= max_vec_(1); ++y)
+      //  for (int z = min_vec_(2); z <= max_vec_(2); ++z)
+      {
+      int z = 16;
       Eigen::Vector3i vox = Eigen::Vector3i(x, y, z);
       if (distance_buffer_[Vox2Idx(vox)] < 0 || distance_buffer_[Vox2Idx(vox)] >= infinity_)
         continue;
-
+      // std::cout<<"z slice is "<<z<<std::endl;
       Eigen::Vector3d pos;
       Vox2Pos(vox, pos);
 
@@ -791,7 +793,7 @@ int fiesta::ESDFMap::FindAndInsert(Eigen::Vector3i hash_key) {
 
 void fiesta::ESDFMap::SetUpdateRange(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos, bool new_vec) {
 #ifndef HASH_TABLE
-  min_pos(0) = std::max(min_pos(0), min_range_(0));
+    min_pos(0) = std::max(min_pos(0), min_range_(0));
     min_pos(1) = std::max(min_pos(1), min_range_(1));
     min_pos(2) = std::max(min_pos(2), min_range_(2));
 

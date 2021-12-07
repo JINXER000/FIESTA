@@ -59,6 +59,10 @@
         "cfenv": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "*.txx": "cpp",
+        "csignal": "cpp",
+        "random": "cpp",
+        "typeindex": "cpp"
     }
 }
