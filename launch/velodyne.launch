@@ -2,8 +2,8 @@
     <node pkg="fiesta" type="test_changerate" name="fiesta" output="screen"
           required="true">
 
-        <param name="resolution" value="0.2"/>
-        <param name="update_esdf_every_n_sec" value="0.1"/>
+        <param name="resolution" value="0.1"/>
+        <param name="update_esdf_every_n_sec" value="0.2"/>
 
         <!--Hash Table only-->
         <param name="reserved_size" value="1000000"/>
@@ -11,10 +11,10 @@
         <!--Array only-->
         <param name="lx" value="-50.0"/>
         <param name="ly" value="-50.0"/>
-        <param name="lz" value="-3"/>
+        <param name="lz" value="-2"/>
         <param name="rx" value="+50.0"/>
         <param name="ry" value="+50.0"/>
-        <param name="rz" value="+3"/>
+        <param name="rz" value="+2"/>
 
         <!-- raycasting parameters -->
         <param name="min_ray_length" value="0.5"/>
@@ -56,7 +56,7 @@
         <!-- visulization -->
         <!--0 for no visulize-->
         <param name="visualize_every_n_updates" value="1"/>
-        <param name="slice_vis_max_dist" value="10.0"/>
+        <param name="slice_vis_max_dist" value="5.0"/>
         <!-- relative to the lz if array is used, relative to the origin if hash table is used -->
         <param name="slice_vis_level" value="1"/>
         <param name="vis_lower_bound" value="0"/>
