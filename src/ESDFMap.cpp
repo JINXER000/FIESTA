@@ -940,7 +940,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
   int a[32];
   std::fill(a, a + 32, 0);
   for (int ii = 1; ii < count; ii++) {
-    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_) {
+    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ /*&& VoxInRange(Eigen::Vector3i(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)))*/) {
       kdtree.nearestKSearch(pcl::PointXYZ(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)), 1,
                             pointIdxNKNSearch, pointNKNSquaredDistance);
       double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
@@ -1012,7 +1012,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
       for (int y = 0; y < grid_size_(1); ++y)
         for (int z = 0; z < grid_size_(2); ++z) {
           int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
-          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_) {
+          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ && VoxInRange(Eigen::Vector3i(x, y, z))) {
             kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
                                   pointIdxNKNSearch, pointNKNSquaredDistance);
             double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;

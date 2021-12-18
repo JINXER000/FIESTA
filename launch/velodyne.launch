@@ -39,7 +39,7 @@
 
         <!-- global / local -->
         <param name="global_map" value="true"/>
-        <param name="global_update" value="true"/>
+        <param name="global_update" value="false"/>
         <param name="global_vis" value="true"/>
         <param name="radius_x" value="10.0"/>
         <param name="radius_y" value="10.0"/>

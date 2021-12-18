@@ -137,7 +137,7 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node) {
 
      occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
      sdf_rcd= new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf.txt");
-     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_rms005-32.txt");
+     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/f_rms005-6.txt");
      std::cout<<"initialize done\n"<<std::endl;
                           
 }
@@ -560,8 +560,10 @@ auto start = std::chrono::steady_clock::now();
 //        std::thread(Visualization, esdf_map_, text).detach();
           Visualization(esdf_map_, parameters_.global_vis_, "");
      }
-     // float rms = esdf_map_->CheckWithGroundTruth();
+     float rms = esdf_map_->CheckWithGroundTruth();
      // rms_rcd->record(rms);
+
+     // std::cout<<"RMS error is "<<rms<<std::endl;
 //    else {
 //        std::thread(Visualization, nullptr, text).detach();
 //        Visualization(nullptr, globalVis, "");
