@@ -1006,13 +1006,13 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
     std::vector<float> pointNKNSquaredDistance(1);
     int cnt1 = 0, cnt2 = 0, cnt3 = 0;
     double ems1 = 0, ems2 = 0, max1 = 0, max2 = 0;
-    int a[32];
-    std::fill(a, a + 32, 0);
+    // int a[32];
+    // std::fill(a, a + 32, 0);
     for (int x = 0; x < grid_size_(0); ++x)
       for (int y = 0; y < grid_size_(1); ++y)
         for (int z = 0; z < grid_size_(2); ++z) {
           int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
-          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ && VoxInRange(Eigen::Vector3i(x, y, z))) {
+          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ /*&& VoxInRange(Eigen::Vector3i(x, y, z))*/) {
             kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
                                   pointIdxNKNSearch, pointNKNSquaredDistance);
             double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
@@ -1028,7 +1028,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
             double error = distance_buffer_[ii] - tmp;
             if (error > 1e-3) {
               cnt1++;
-              a[(int) (error / 0.1)]++;
+              // a[(int) (error / 0.1)]++;
             }
             if (error < -1e-3) {
               cnt3++;
@@ -1045,6 +1045,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
     std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
     std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
     std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
+    float rms_err = sqrt(ems2 / cnt2);
     std::cout <<"sqrt"<< ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
     std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
     // for (int i = 0; i < 32; i++) {
@@ -1053,7 +1054,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
 
 #endif
   // return true;
-  return sqrt(ems2 / cnt2);
+  return rms_err;
 }
 
 // endregion

@@ -24,6 +24,7 @@
 #include <sensor_msgs/PointCloud.h>
 #include <unordered_set>
 #include <time_recorder.h>
+#include "std_srvs/SetBool.h"
 
 namespace fiesta {
 
@@ -137,7 +138,7 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node) {
 
      occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
      sdf_rcd= new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf.txt");
-     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/f_rms005-6.txt");
+     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/f_rms010-6.txt");
      std::cout<<"initialize done\n"<<std::endl;
                           
 }
@@ -555,15 +556,29 @@ auto start = std::chrono::steady_clock::now();
 //                       + " ms\n" + "Average update Time\n" +
 //                       timing::Timing::SecondsToTimeString(timing::Timing::GetMeanSeconds("UpdateESDF") * 1000)
 //                       + " ms";
+    //pause rosbag
+    std_srvs::SetBool pausesrv;
+    pausesrv.request.data = true;
+    pausesrv.response.message ="rosbag paused!";
+    ros::service::call("/my_bag/pause_playback",pausesrv);
+    update_mesh_timer_.stop();
 
      if (parameters_.visualize_every_n_updates_!=0 && esdf_cnt_%parameters_.visualize_every_n_updates_==0) {
 //        std::thread(Visualization, esdf_map_, text).detach();
           Visualization(esdf_map_, parameters_.global_vis_, "");
      }
+     std::cout<<"checking gt!"<<std::endl;
      float rms = esdf_map_->CheckWithGroundTruth();
-     // rms_rcd->record(rms);
+     std::cout<<"RMS error is "<<rms<<std::endl;
+     rms_rcd->record(rms);
 
-     // std::cout<<"RMS error is "<<rms<<std::endl;
+         //resume rosbag
+    std_srvs::SetBool resumesrv;
+    resumesrv.request.data = false;
+    resumesrv.response.message ="rosbag resume!";
+    ros::service::call("/my_bag/pause_playback",resumesrv);
+    update_mesh_timer_.start();
+    
 //    else {
 //        std::thread(Visualization, nullptr, text).detach();
 //        Visualization(nullptr, globalVis, "");

@@ -3,7 +3,7 @@
           required="true">
 
         <param name="resolution" value="0.1"/>
-        <param name="update_esdf_every_n_sec" value="0.2"/>
+        <param name="update_esdf_every_n_sec" value="0.5"/>
 
         <!--Hash Table only-->
         <param name="reserved_size" value="1000000"/>
@@ -39,7 +39,7 @@
 
         <!-- global / local -->
         <param name="global_map" value="true"/>
-        <param name="global_update" value="false"/>
+        <param name="global_update" value="true"/>
         <param name="global_vis" value="true"/>
         <param name="radius_x" value="10.0"/>
         <param name="radius_y" value="10.0"/>
