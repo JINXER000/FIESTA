@@ -71,6 +71,19 @@ bool fiesta::ESDFMap::VoxInRange(Eigen::Vector3i vox, bool current_vec) {
         && vox(2) >= last_min_vec_(2) && vox(2) <= last_max_vec_(2));
 }
 
+bool fiesta::ESDFMap::VoxInLocalRange(Eigen::Vector3i vox, Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
+
+    Eigen::Vector3i min_vox, max_vox;
+    Pos2Vox(min_pos, min_vox);
+    Pos2Vox(
+    max_pos - Eigen::Vector3d(resolution_ / 2, resolution_ / 2, resolution_ / 2),
+    max_vox);
+
+    return (vox(0) >= min_vox(0) && vox(0) <= max_vox(0)
+        && vox(1) >= min_vox(1) && vox(1) <= max_vox(1)
+        && vox(2) >= min_vox(2) && vox(2) <= max_vox(2));
+}
+
 void fiesta::ESDFMap::Pos2Vox(Eigen::Vector3d pos, Eigen::Vector3i &vox) {
   for (int i = 0; i < 3; ++i)
     vox(i) = floor((pos(i) - origin_(i)) / resolution_);
@@ -904,7 +917,7 @@ bool fiesta::ESDFMap::CheckConsistency() {
 }
 
 // only for test, check between Ground Truth calculated by k-d tree
-float fiesta::ESDFMap::CheckWithGroundTruth() {
+float fiesta::ESDFMap::CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
 #ifdef HASH_TABLE
   Eigen::Vector3i ma = Eigen::Vector3i(0, 0, 0), mi = Eigen::Vector3i(0, 0, 0);
   //        ESDFMap *esdf_map_ = new ESDFMap(Eigen::Vector3d(0, 0, 0), resolution, 10000000);
@@ -1008,11 +1021,15 @@ float fiesta::ESDFMap::CheckWithGroundTruth() {
     double ems1 = 0, ems2 = 0, max1 = 0, max2 = 0;
     // int a[32];
     // std::fill(a, a + 32, 0);
+    // costumize update range
+
+
+
     for (int x = 0; x < grid_size_(0); ++x)
       for (int y = 0; y < grid_size_(1); ++y)
         for (int z = 0; z < grid_size_(2); ++z) {
           int ii = Vox2Idx(Eigen::Vector3i(x, y, z));
-          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ /*&& VoxInRange(Eigen::Vector3i(x, y, z))*/) {
+          if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ && VoxInLocalRange(Eigen::Vector3i(x, y, z), min_pos, max_pos)) {
             kdtree.nearestKSearch(pcl::PointXYZ(x, y, z), 1,
                                   pointIdxNKNSearch, pointNKNSquaredDistance);
             double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;

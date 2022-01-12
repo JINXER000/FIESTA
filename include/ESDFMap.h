@@ -55,6 +55,8 @@ class ESDFMap {
   // parameters & methods for conversion between Pos, Vox & Idx
   bool PosInMap(Eigen::Vector3d pos);
   bool VoxInRange(Eigen::Vector3i vox, bool current_vec = true);
+  bool VoxInLocalRange(Eigen::Vector3i vox, Eigen::Vector3d min_pos, Eigen::Vector3d max_pos);
+
   void Vox2Pos(Eigen::Vector3i vox, Eigen::Vector3d &pos);
   int Vox2Idx(Eigen::Vector3i vox);
   int Vox2Idx(Eigen::Vector3i vox, int sub_sampling_factor);
@@ -160,7 +162,7 @@ class ESDFMap {
   // only for test, check whether consistent
   bool CheckConsistency();
   // only for test, check between Ground Truth calculated by k-d tree
-  float CheckWithGroundTruth();
+float CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos);
 #endif
 
 };
