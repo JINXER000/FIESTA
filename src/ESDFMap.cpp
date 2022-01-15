@@ -692,7 +692,7 @@ void fiesta::ESDFMap::GetSliceMarker(visualization_msgs::Marker &m, int slice, i
     for (int y = min_vec_(1); y <= max_vec_(1); ++y)
       //  for (int z = min_vec_(2); z <= max_vec_(2); ++z)
       {
-      int z = 16;
+      int z = 24;
       Eigen::Vector3i vox = Eigen::Vector3i(x, y, z);
       if (distance_buffer_[Vox2Idx(vox)] < 0 || distance_buffer_[Vox2Idx(vox)] >= infinity_)
         continue;
@@ -918,7 +918,10 @@ bool fiesta::ESDFMap::CheckConsistency() {
 
 // only for test, check between Ground Truth calculated by k-d tree
 float fiesta::ESDFMap::CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
+  float rms_err = 0;
+
 #ifdef HASH_TABLE
+
   Eigen::Vector3i ma = Eigen::Vector3i(0, 0, 0), mi = Eigen::Vector3i(0, 0, 0);
   //        ESDFMap *esdf_map_ = new ESDFMap(Eigen::Vector3d(0, 0, 0), resolution, 10000000);
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_(new pcl::PointCloud<pcl::PointXYZ>);
