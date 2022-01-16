@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/opt/ros/kinetic/include/**",
+                "/home/yzchen/env/catkin_ws/devel/include/**",
+                "/home/yzchen/CODE/UAV/change_rate/fiesta_change_ws/src/FIESTA-master/include/**",
+                "/home/yzchen/env/catkin_ws/src/zed-ros-wrapper-master/zed_interfaces/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

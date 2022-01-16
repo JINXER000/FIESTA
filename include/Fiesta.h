@@ -136,8 +136,8 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node) {
          node.createTimer(ros::Duration(parameters_.update_esdf_every_n_sec_),
                           &Fiesta::UpdateEsdfEvent, this);
 
-     occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
-     sdf_rcd= new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf.txt");
+     occu_rcd = new tm_rcd("/home/yzchen/CODE/UAV/change_rate/fiesta_change_ws/logs/fiesta_occu_5m.txt");
+     sdf_rcd= new tm_rcd("/home/yzchen/CODE/UAV/change_rate/fiesta_change_ws/logs/fiesta_sdf_5m.txt");
      rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/f_rms020.txt");
      std::cout<<"initialize done\n"<<std::endl;
                           
@@ -575,7 +575,7 @@ auto start = std::chrono::steady_clock::now();
 //     pausesrv.response.message ="rosbag paused!";
 //     ros::service::call("/my_bag/pause_playback",pausesrv);
 //     update_mesh_timer_.stop();
-          Visualization(esdf_map_, parameters_.global_vis_, "");
+          // Visualization(esdf_map_, parameters_.global_vis_, "");
 
 
 //                std::cout<<"checking gt in range of "<< parameters_.radius_<<std::endl;
