@@ -2,8 +2,8 @@
     <node pkg="fiesta" type="test_changerate" name="fiesta" output="screen"
           required="true">
 
-        <param name="resolution" value="0.1"/>
-        <param name="update_esdf_every_n_sec" value="0.2"/>
+        <param name="resolution" value="0.05"/>
+        <param name="update_esdf_every_n_sec" value="0.5"/>
 
         <!--Hash Table only-->
         <param name="reserved_size" value="1000000"/>
@@ -17,7 +17,7 @@
         <param name="rz" value="+2"/>
 
         <!-- raycasting parameters -->
-        <param name="min_ray_length" value="0.5"/>
+        <param name="min_ray_length" value="0.3"/>
         <param name="max_ray_length" value="5.0"/>
         <!--If hash table is used, make sure the value is 0. In array implementation, 0 means no other thread.-->
         <param name="ray_cast_num_thread" value="0"/>
@@ -39,7 +39,7 @@
 
         <!-- global / local -->
         <param name="global_map" value="true"/>
-        <param name="global_update" value="true"/>
+        <param name="global_update" value="false"/>
         <param name="global_vis" value="true"/>
         <param name="radius_x" value="5.0"/>
         <param name="radius_y" value="5.0"/>
