@@ -84,6 +84,15 @@ bool fiesta::ESDFMap::VoxInLocalRange(Eigen::Vector3i vox, Eigen::Vector3d min_p
         && vox(2) >= min_vox(2) && vox(2) <= max_vox(2));
 }
 
+bool fiesta::ESDFMap::VoxInLocalRange(Eigen::Vector3d vox, Eigen::Vector3d min_pos, Eigen::Vector3d max_pos) {
+
+
+
+    return (vox(0) >= min_pos(0) && vox(0) <= max_pos(0)
+        && vox(1) >= min_pos(1) && vox(1) <= max_pos(1)
+        && vox(2) >= min_pos(2) && vox(2) <= max_pos(2));
+}
+
 void fiesta::ESDFMap::Pos2Vox(Eigen::Vector3d pos, Eigen::Vector3i &vox) {
   for (int i = 0; i < 3; ++i)
     vox(i) = floor((pos(i) - origin_(i)) / resolution_);
@@ -956,7 +965,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vect
   int a[32];
   std::fill(a, a + 32, 0);
   for (int ii = 1; ii < count; ii++) {
-    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ /*&& VoxInRange(Eigen::Vector3i(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)))*/) {
+    if (distance_buffer_[ii] >= 0 && distance_buffer_[ii] < infinity_ && VoxInLocalRange(vox_buffer_[ii], min_pos, max_pos)) {
       kdtree.nearestKSearch(pcl::PointXYZ(vox_buffer_[ii](0), vox_buffer_[ii](1), vox_buffer_[ii](2)), 1,
                             pointIdxNKNSearch, pointNKNSquaredDistance);
       double tmp = sqrt(pointNKNSquaredDistance[0]) * resolution_;
@@ -1065,8 +1074,7 @@ float fiesta::ESDFMap::CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vect
     std::cout << ems1 << " / " << cnt1 << " = " << ems1 / cnt1 << std::endl;
     std::cout << ems1 << " / " << cnt2 << " = " << ems1 / cnt2 << std::endl;
     std::cout << ems2 << " / " << cnt1 << " = " << ems2 / cnt1 << std::endl;
-    float rms_err = sqrt(ems2 / cnt2);
-    std::cout <<"sqrt"<< ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
+
     std::cout << "max = " << max1 << "\tcnt3 = " << cnt3 << std::endl;
     // for (int i = 0; i < 32; i++) {
     //   std::cout << " [ " << i * 0.1 << ", " << i * 0.1 + 0.1 << " ]\t" << a[i] << std::endl;
@@ -1074,6 +1082,8 @@ float fiesta::ESDFMap::CheckWithGroundTruth(Eigen::Vector3d min_pos, Eigen::Vect
 
 #endif
   // return true;
+  rms_err = sqrt(ems2 / cnt2);
+   std::cout <<"sqrt"<< ems2 << " / " << cnt2 << " = " << sqrt(ems2 / cnt2) << std::endl;
   return rms_err;
 }
 

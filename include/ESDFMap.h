@@ -56,6 +56,7 @@ class ESDFMap {
   bool PosInMap(Eigen::Vector3d pos);
   bool VoxInRange(Eigen::Vector3i vox, bool current_vec = true);
   bool VoxInLocalRange(Eigen::Vector3i vox, Eigen::Vector3d min_pos, Eigen::Vector3d max_pos);
+  bool VoxInLocalRange(Eigen::Vector3d vox, Eigen::Vector3d min_pos, Eigen::Vector3d max_pos);
 
   void Vox2Pos(Eigen::Vector3i vox, Eigen::Vector3d &pos);
   int Vox2Idx(Eigen::Vector3i vox);

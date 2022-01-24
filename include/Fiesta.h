@@ -138,7 +138,7 @@ Fiesta<DepthMsgType, PoseMsgType>::Fiesta(ros::NodeHandle node) {
 
      occu_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_occu.txt");
      sdf_rcd= new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fiesta_sdf.txt");
-     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/f_rms020.txt");
+     rms_rcd = new tm_rcd("/home/joseph/yzchen_ws/UAV/cpc_ws/src/core_modules/cpc_aux_mapping/logs/fcow_rms020.txt");
      std::cout<<"initialize done\n"<<std::endl;
                           
 }
@@ -217,11 +217,11 @@ void Fiesta<DepthMsgType, PoseMsgType>::RaycastProcess(int i, int part, int tt) 
           Eigen::Vector4d tmp = transform_*Eigen::Vector4d(pt.x, pt.y, pt.z, 1);
           Eigen::Vector3d point = Eigen::Vector3d(tmp(0), tmp(1), tmp(2))/tmp(3);
 
-          // cut gnd
-          if(point(2) < 0.1 || point(2) > 1.6)
-          {
-               continue;
-          }
+          // // cut gnd
+          // if(point(2) < 0.1 || point(2) > 1.6)
+          // {
+          //      continue;
+          // }
           int tmp_idx;
           double length = (point - raycast_origin_).norm();
           if (length < parameters_.min_ray_length_)
@@ -569,26 +569,26 @@ auto start = std::chrono::steady_clock::now();
      if (parameters_.visualize_every_n_updates_!=0 && esdf_cnt_%parameters_.visualize_every_n_updates_==0) {
 //        std::thread(Visualization, esdf_map_, text).detach();
 
-//     //pause rosbag
-//     std_srvs::SetBool pausesrv;
-//     pausesrv.request.data = true;
-//     pausesrv.response.message ="rosbag paused!";
-//     ros::service::call("/my_bag/pause_playback",pausesrv);
-//     update_mesh_timer_.stop();
+    //pause rosbag
+    std_srvs::SetBool pausesrv;
+    pausesrv.request.data = true;
+    pausesrv.response.message ="rosbag paused!";
+    ros::service::call("/my_bag/pause_playback",pausesrv);
+    update_mesh_timer_.stop();
           Visualization(esdf_map_, parameters_.global_vis_, "");
 
 
-//                std::cout<<"checking gt in range of "<< parameters_.radius_<<std::endl;
-//      float rms = esdf_map_->CheckWithGroundTruth(cur_pos_ - parameters_.radius_, cur_pos_ + parameters_.radius_);
-//      std::cout<<"RMS error is "<<rms<<std::endl;
-//      rms_rcd->record(rms);
+               std::cout<<"checking gt in range of "<< parameters_.radius_<<std::endl;
+     float rms = esdf_map_->CheckWithGroundTruth(cur_pos_ - parameters_.radius_, cur_pos_ + parameters_.radius_);
+     std::cout<<"RMS error is "<<rms<<std::endl;
+     rms_rcd->record(rms);
 
-//          //resume rosbag
-//     std_srvs::SetBool resumesrv;
-//     resumesrv.request.data = false;
-//     resumesrv.response.message ="rosbag resume!";
-//     ros::service::call("/my_bag/pause_playback",resumesrv);
-//     update_mesh_timer_.start();
+         //resume rosbag
+    std_srvs::SetBool resumesrv;
+    resumesrv.request.data = false;
+    resumesrv.response.message ="rosbag resume!";
+    ros::service::call("/my_bag/pause_playback",resumesrv);
+    update_mesh_timer_.start();
      }
 
     
